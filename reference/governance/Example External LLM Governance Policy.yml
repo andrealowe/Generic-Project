@@ -1,0 +1,112 @@
+classification:
+stages:
+  - name: "Intake"
+    evidenceSet:
+      - id: Local.llm-risk-assessment
+        name: "LLM Use Case & Risk Assessment"
+        description: >
+          Assess the inherent risks associated with deploying a particular large language model 
+          across various applications, including misuse, privacy, and bias.
+        definition:
+          - artifactType: input
+            details:
+              label: "Do we have a vendor agreement with the creator of this model?"
+              type: radio
+              options:
+                - Yes
+                - No
+          - artifactType: input
+            details:
+              label: "Is this model hosted externally (by the vendor) or internally?"
+              type: radio
+              options:
+                - Externally
+                - Internally
+  - name: "Automated Testing"
+    evidenceSet:
+      - id: Local.automated-testing
+        name: "Automated Testing and Safety Checks"
+        description: >
+          This evidence set includes automated testing and safety checks to ensure the model's 
+          performance, safety, and bias mitigation.
+        definition:
+          - artifactType: policyScriptedCheck
+            details:
+              name: "Bias & Safety Detection Script"
+              command: 
+              parameters:
+                - name: script_root_path
+                  type: text
+                  default: /mnt
+              environment: Domino Standard Domino Py3.10 R4.4
+              hardwareTier: Medium
+              volumeSizeGiB: 8
+    approvals:
+      - name: Automated Testing Approval
+        approvers:    
+          - anthony_huinker
+        evidence:
+          id: Local.safety-checks
+          name: "Model Safety and Bias Checks"
+          description: >
+            Evaluate the model's responses for safety, bias, and adherence to ethical guidelines. 
+            This stage includes both manual assessments and automated scripted checks.
+          definition:
+            - artifactType: input
+              details:
+                label: "Have comprehensive safety and bias tests been performed on the model?"
+                type: radio
+                options:
+                  - Yes
+                  - No
+                tooltip: "Confirm that the model has undergone rigorous evaluation for harmful biases and unsafe outputs."
+  - name: "Private Preview"
+    evidenceSet:
+      - id: Local.previate-preview
+        name: "Testing with subset of early access users"
+        description: >
+          This evidenceset collects early access user evaluation details and sign-off. 
+        definition:
+          - artifactType: input
+            details:
+              label: "Have early access users faced reported any issues while using the model?"
+              type: radio
+              options:
+                - Yes
+                - No
+          - artifactType: input
+            details:
+              label: "Have any publicly known vulnerabilities been released since entering private preview?"
+              type: textarea
+
+  - name: "Generally Available"
+    approvals:
+      - name: "LLM Governance Approval"
+        approvers:
+          - anthony_huinker
+        evidence:
+          id: Local.deployment-readiness
+          name: "Deployment Readiness Checklist"
+          description: >
+            Final approval checklist to confirm that all safety, bias, financial,  
+            and operational standards have been met prior to deployment.
+          definition:
+            - artifactType: input
+              details:
+                label: "Have all safety, bias, and early access evaluations been satisfactorily completed?"
+                type: radio
+                options:
+                  - Yes
+                  - No
+            - artifactType: input
+              details:
+                label: "Is there an vendor agreement in place for the usage of this model?"
+                type: radio
+                options:
+                  - Yes
+                  - No
+            - artifactType: input
+              details:
+                type: textinput
+                label: "Additional comments or concerns for final review:"
+                placeholder: "Enter any remarks or suggestions here"

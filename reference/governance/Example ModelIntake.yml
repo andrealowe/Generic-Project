@@ -1,0 +1,246 @@
+rule:
+  artifacts:
+    - model-governance
+classification:
+  rule: |
+    visibilityMap := []rune("00")
+    if classificationInputs["ITSecReview"].(string) == "Yes" {
+        visibilityMap[0] = '1'
+    }
+    if classificationInputs["LegalReview"].(string) == "Yes" {
+        visibilityMap[1] = '1'
+    }
+    return string(visibilityMap)
+stages:
+  - name: Intake
+    evidenceSet:
+      - name: Model Purpose
+        description: Define the purpose of the proposed model
+        id: Local.model-purpose
+        definition:
+          - artifactType: input
+            details:
+              label: What is the purpose of this model?
+              type: textarea
+              placeholder: Describe the specific business problem this model will solve and
+                its intended outcomes...
+      - name: Consumption Method
+        description: Specify how the model will be consumed
+        id: Local.consumption-method
+        definition:
+          - artifactType: input
+            details:
+              label: How will this model be consumed?
+              type: select
+              options:
+                - API
+                - Batch Job
+                - Application Integration
+                - Interactive Dashboard
+                - Automated Decision System
+                - Other (please specify)
+      - name: Technology Stack
+        description: Detail the technologies that will be used to build the model
+        id: Local.technology-stack
+        definition:
+          - artifactType: input
+            details:
+              label: What technology will be used to build this model?
+              type: textarea
+              placeholder: List all Python libraries, frameworks, code repositories, and other
+                technologies that will be used...
+      - name: Data Sources
+        description: Identify the data sources that will be used to build the model
+        id: Local.data-sources
+        definition:
+          - artifactType: input
+            details:
+              label: What data do you plan to use to build this model?
+              type: checkbox
+              options:
+                - Customer Data
+                - Open Source Data
+                - Vendor Supplied Data
+                - Internal Operational Data
+                - Synthetic Data
+                - Public Data
+                - Third-party Data
+                - Other (please specify)
+    approvals:
+      - name: Intake Review
+        approvers:
+          - model-gov-org
+          - infosec-review
+          - legal-review
+        evidence:
+          name: Intake Verification
+          description: Verify completeness of model intake information
+          id: Local.intake-signoff
+          definition:
+            - artifactType: input
+              details:
+                label: Is the model intake information complete and ready for stakeholder
+                  review?
+                type: radio
+                options:
+                  - Yes
+                  - No, Additional Information Required
+            - artifactType: input
+              aliasForClassification: LegalReview
+              details:
+                type: radio
+                label: Legal
+                options:
+                  - label: Yes
+                    value: Yes
+                  - label: No
+                    value: No
+            - artifactType: input
+              aliasForClassification: ITSecReview
+              details:
+                type: radio
+                label: It Sec
+                options:
+                  - label: Yes
+                    value: Yes
+                  - label: No
+                    value: No
+  - name: ITSec Questionnaire
+    evidenceSet:
+      - visibilityRule: string(classificationValue[0]) == "1"
+        name: Data Sensitivity
+        description: Data Sensitivity
+        id: Local.security-question1
+        definition:
+          - artifactType: input
+            details:
+              label: What types of sensitive or regulated data will be processed or stored by
+                this model?
+              type: textarea
+              placeholder: Detail all categories of sensitive data (PII, PHI, financial, etc.)
+                that will be used by this model...
+              conditionalDisplay:
+                dependsOn: Local.security-review
+                showIfValue: Yes
+      - visibilityRule: string(classificationValue[0]) == "1"
+        name: Authentication
+        description: Authentication question
+        id: Local.security-question2
+        definition:
+          - artifactType: input
+            details:
+              label: How will access to the model be authenticated and authorized?
+              type: textarea
+              placeholder: Describe the authentication mechanisms, role-based access controls,
+                and authorization procedures...
+              conditionalDisplay:
+                dependsOn: Local.security-review
+                showIfValue: Yes
+    approvals:
+      - name: ITSec Review
+        approvers:
+          - infosec-review
+        evidence:
+          name: Intake Verification
+          description: Verify completeness of model intake information
+          id: Local.infosec-signoff
+          definition:
+            - artifactType: input
+              details:
+                label: Is the model intake information sufficient for approval?
+                type: radio
+                options:
+                  - Yes
+                  - No
+  - name: Legal Questionnaire
+    evidenceSet:
+      - visibilityRule: string(classificationValue[1]) == "1"
+        name: Compliance
+        description: Compliance question
+        id: Local.legal-question1
+        definition:
+          - artifactType: input
+            details:
+              label: Does this model comply with all applicable data protection and privacy
+                regulations?
+              type: textarea
+              placeholder: Address compliance with regulations such as GDPR, CCPA, HIPAA, etc.
+                as applicable...
+              conditionalDisplay:
+                dependsOn: Local.legal-review
+                showIfValue: Yes
+      - visibilityRule: string(classificationValue[1]) == "1"
+        name: Intelectual Property
+        description: Intellectual property question
+        id: Local.legal-question2
+        definition:
+          - artifactType: input
+            details:
+              label: What intellectual property considerations exist for this model and its
+                output?
+              type: textarea
+              placeholder: Discuss IP ownership, licensing requirements, and potential IP
+                risks...
+              conditionalDisplay:
+                dependsOn: Local.legal-review
+                showIfValue: Yes
+    approvals:
+      - name: Legal Review
+        approvers:
+          - legal-review
+        evidence:
+          name: Intake Verification
+          description: Verify completeness of model intake information
+          id: Local.legal-signoff
+          definition:
+            - artifactType: input
+              details:
+                label: Is the model intake information sufficient for approval?
+                type: radio
+                options:
+                  - Yes
+                  - No
+
+  - name: Model Governance Review
+    evidenceSet:
+      - id: Local.governance-review
+        name: Model Governance Assessment
+        description: Assessment by Model Governance based on stakeholder input
+        definition:
+          - artifactType: input
+            details:
+              label: Model Governance Review Comments
+              type: textarea
+              placeholder: Document the governance team's assessment, findings, and recommendations based on stakeholder input...
+      - id: Local.governance-conditions
+        name: Governance Conditions
+        description: Any conditions imposed by Model Governance for development approval
+        definition:
+          - artifactType: input
+            details:
+              label: Are there any conditions or requirements for model development approval?
+              type: textarea
+              placeholder: List any conditions, requirements, or constraints that must be addressed during model development...
+    approvals:
+      - name: Model Governance Sign Off
+        allowAdditionalApprovers: true
+        approvers:
+          - model-gov-org
+        evidence:
+          id: Local.governance-signoff
+          name: Model Governance Approval
+          description: Final approval for model development
+          definition:
+            - artifactType: input
+              details:
+                label: Does Model Governance approve this model for development?
+                type: radio
+                options:
+                  - Approved to Proceed
+                  - Tentatively Approved (See Findings)
+                  - Requires more Information
+            - artifactType: input
+              details:
+                label: Justification for decision
+                type: textarea
+                placeholder: Provide justification for the approval decision and any required next steps...
