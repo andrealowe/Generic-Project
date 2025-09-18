@@ -22,6 +22,15 @@ The repository follows a standardized structure:
 └── data/{project}/{stage}/ # Project-specific datasets
 ```
 
+Where `{stage}` represents one of the following directories:
+- `e001-business-analysis` - Business requirements and analysis
+- `e002-data-wrangling` - Data acquisition and preparation
+- `e003-data-science` - Exploratory data analysis and insights
+- `e004-model-development` - Model training and optimization
+- `e005-model-validation` - Model testing and validation
+- `e006-mlops` - ML operations and deployment
+- `e007-frontend` - User interface and visualization
+
 ## Available Agents
 
 ### Core Agents
@@ -39,13 +48,13 @@ The repository follows a standardized structure:
 - **Example-Demonstration-Flows**: Workflow examples and file organization
 
 ### Governance Integration
-- **Governance Policies**: Located in `/mnt/code/reference/governance/`
+- **Governance Policies**: Located in `/mnt/code/.reference/governance/`
   - NIST Risk Management Framework (RMF)
   - Model Risk Management V3
   - Ethical AI Framework
   - Model Intake Process
   - External LLM Governance Policy
-- **Approver Groups**: Defined in `/mnt/code/reference/governance/Approvers.md`
+- **Approver Groups**: Defined in `/mnt/code/.reference/governance/Approvers.md`
   - Modeling teams (modeling-review, modeling-practitioners, modeling-leadership)
   - IT teams (it-review, it-leadership)
   - Information Security (infosec-review, infosec-leadership)
@@ -84,7 +93,7 @@ The repository follows a standardized structure:
 - Comprehensive artifact tracking at each stage
 
 ### File Organization
-- Each agent creates its own stage directory under `/mnt/code/{stage}/`
+- Each agent creates its own stage directory under `/mnt/code/{stage}/` (e.g., `/mnt/code/e001-business-analysis/`)
 - Notebooks go in `{stage}/notebooks/`, scripts in `{stage}/scripts/`
 - Artifacts saved to `/mnt/artifacts/{stage}/`
 - Data organized by project: `/mnt/data/{project}/{stage}/`

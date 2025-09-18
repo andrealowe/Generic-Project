@@ -298,7 +298,7 @@ def load_governance_policies(self):
     import os
 
     policies = {}
-    governance_dir = "/mnt/code/reference/governance"
+    governance_dir = "/mnt/code/.reference/governance"
 
     if os.path.exists(governance_dir):
         policy_files = {

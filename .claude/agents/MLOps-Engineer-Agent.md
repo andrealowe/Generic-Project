@@ -63,7 +63,7 @@ def create_production_pipeline(self, components, requirements):
     from datetime import datetime
     
     # Initialize MLflow experiment for deployment
-    experiment_name = f"mlops_deployment_{requirements.get('project', 'prod')}"
+    experiment_name = f"e006_mlops_deployment_{requirements.get('project', 'prod')}"
     mlflow.set_experiment(experiment_name)
     
     pipeline = {
@@ -74,8 +74,8 @@ def create_production_pipeline(self, components, requirements):
     }
     
     with mlflow.start_run(run_name="production_pipeline_setup") as run:
-        mlflow.set_tag("stage", "mlops_deployment")
-        mlflow.set_tag("agent", "mlops_engineer")
+        mlflow.set_tag("stage", "e006_mlops_deployment")
+        mlflow.set_tag("agent", "e006_mlops_engineer")
         
         try:
             # Log deployment requirements

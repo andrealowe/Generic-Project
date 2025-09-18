@@ -74,12 +74,12 @@ def create_model_application(self, model_api, requirements):
     from datetime import datetime
     
     # Initialize MLflow for app development tracking
-    experiment_name = f"frontend_development_{requirements.get('app_name', 'model_app')}"
+    experiment_name = f"e007_frontend_development_{requirements.get('app_name', 'model_app')}"
     mlflow.set_experiment(experiment_name)
     
     with mlflow.start_run(run_name="frontend_app_creation"):
-        mlflow.set_tag("stage", "frontend_development")
-        mlflow.set_tag("agent", "frontend_developer")
+        mlflow.set_tag("stage", "e007_frontend_development")
+        mlflow.set_tag("agent", "e007_frontend_developer")
         
         # Analyze requirements to select best technology
         tech_recommendation = self.analyze_and_recommend_technology(requirements)

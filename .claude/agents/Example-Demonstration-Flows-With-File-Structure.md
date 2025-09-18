@@ -42,43 +42,43 @@ requirements = {
 
 # Directory structure created:
 # /mnt/code/
-#   ├── data_acquisition/
+#   ├── e002-data-wrangling/
 #   │   ├── notebooks/         # Data exploration notebooks
 #   │   ├── scripts/           # Data wrangling scripts
 #   │   └── requirements.txt   # pandas, numpy, etc.
-#   ├── eda/
+#   ├── e003-data-science/
 #   │   ├── notebooks/         # EDA notebooks
 #   │   ├── scripts/           # Dashboard scripts
 #   │   └── requirements.txt   # plotly, seaborn, etc.
-#   ├── model_development/
+#   ├── e004-model-development/
 #   │   ├── notebooks/         # Experimentation notebooks
 #   │   ├── scripts/           # Training scripts
 #   │   └── requirements.txt   # sklearn, xgboost, etc.
-#   ├── model_validation/
+#   ├── e005-model-validation/
 #   │   ├── notebooks/         # Validation notebooks
 #   │   ├── scripts/           # Test scripts
 #   │   └── requirements.txt   # fairlearn, evidently, etc.
-#   ├── deployment/
+#   ├── e006-mlops/
 #   │   ├── scripts/           # API serving scripts
 #   │   ├── configs/           # Deployment configs
 #   │   └── requirements.txt   # fastapi, mlflow, etc.
-#   └── frontend_development/
+#   └── e007-frontend/
 #       ├── scripts/           # UI applications
 #       └── requirements.txt   # streamlit, dash, etc.
 #
 # /mnt/artifacts/
-#   ├── data_acquisition/      # Data profiles, test JSONs
-#   ├── eda/                   # Reports, visualizations
+#   ├── e002-data-wrangling/      # Data profiles, test JSONs
+#   ├── e003-data-science/                   # Reports, visualizations
 #   │   └── visualizations/    # Plot images
-#   ├── model_development/     # Models, metrics, test data
+#   ├── e004-model-development/     # Models, metrics, test data
 #   │   └── models/           # Saved model files
-#   ├── model_validation/      # Validation reports
-#   └── deployment/            # Configs, monitoring specs
+#   ├── e005-model-validation/      # Validation reports
+#   └── e006-mlops/            # Configs, monitoring specs
 #
 # /mnt/data/customer_churn/     # Mounted Domino dataset
-#   ├── data_acquisition/      # Raw and synthetic data
-#   ├── eda/                   # Processed datasets
-#   ├── model_development/     # Train/val/test splits
+#   ├── e002-data-wrangling/      # Raw and synthetic data
+#   ├── e003-data-science/                   # Processed datasets
+#   ├── e004-model-development/     # Train/val/test splits
 #   └── features/              # Feature store
 
 # Each agent logs artifacts both locally and to MLflow
@@ -86,51 +86,51 @@ with mlflow.start_run(run_name="customer_churn_pipeline"):
     
     # Data Wrangler
     data = data_wrangler.acquire_data(specs)
-    # Saves notebooks: /mnt/code/data_acquisition/notebooks/
-    # Saves scripts: /mnt/code/data_acquisition/scripts/
-    # Saves artifacts: /mnt/artifacts/data_acquisition/
-    # Saves data: /mnt/data/customer_churn/data_acquisition/
-    # Creates: /mnt/code/data_acquisition/requirements.txt
+    # Saves notebooks: /mnt/code/e002-data-wrangling/notebooks/
+    # Saves scripts: /mnt/code/e002-data-wrangling/scripts/
+    # Saves artifacts: /mnt/artifacts/e002-data-wrangling/
+    # Saves data: /mnt/data/customer_churn/e002-data-wrangling/
+    # Creates: /mnt/code/e002-data-wrangling/requirements.txt
     # Logs to MLflow: data samples, profile reports
     
     # Data Scientist
     eda_results = data_scientist.perform_eda(data)
-    # Saves notebooks: /mnt/code/eda/notebooks/
-    # Saves scripts: /mnt/code/eda/scripts/
-    # Saves artifacts: /mnt/artifacts/eda/
-    # Saves data: /mnt/data/customer_churn/eda/
-    # Creates: /mnt/code/eda/requirements.txt
+    # Saves notebooks: /mnt/code/e003-data-science/notebooks/
+    # Saves scripts: /mnt/code/e003-data-science/scripts/
+    # Saves artifacts: /mnt/artifacts/e003-data-science/
+    # Saves data: /mnt/data/customer_churn/e003-data-science/
+    # Creates: /mnt/code/e003-data-science/requirements.txt
     # Logs to MLflow: profile report, plots, insights
     
     # Model Developer
     model = model_developer.develop_models(data)
-    # Saves notebooks: /mnt/code/model_development/notebooks/
-    # Saves scripts: /mnt/code/model_development/scripts/
-    # Saves artifacts: /mnt/artifacts/model_development/models/
-    # Saves data: /mnt/data/customer_churn/model_development/
-    # Creates: /mnt/code/model_development/requirements.txt
+    # Saves notebooks: /mnt/code/e004-model-development/notebooks/
+    # Saves scripts: /mnt/code/e004-model-development/scripts/
+    # Saves artifacts: /mnt/artifacts/e004-model-development/models/
+    # Saves data: /mnt/data/customer_churn/e004-model-development/
+    # Creates: /mnt/code/e004-model-development/requirements.txt
     # Logs to MLflow: registered models with signatures
     
     # MLOps Engineer
     deployment = mlops_engineer.deploy(model)
-    # Saves scripts: /mnt/code/deployment/scripts/
-    # Saves configs: /mnt/code/deployment/configs/
-    # Saves artifacts: /mnt/artifacts/deployment/
-    # Creates: /mnt/code/deployment/requirements.txt
+    # Saves scripts: /mnt/code/e006-mlops/scripts/
+    # Saves configs: /mnt/code/e006-mlops/configs/
+    # Saves artifacts: /mnt/artifacts/e006-mlops/
+    # Creates: /mnt/code/e006-mlops/requirements.txt
     # Logs to MLflow: deployment specs, monitoring config
     
     # Front-End Developer (recommends Streamlit)
     frontend = frontend_developer.create_app(model, requirements)
-    # Saves scripts: /mnt/code/frontend_development/scripts/
-    # Saves artifacts: /mnt/artifacts/frontend_development/
-    # Creates: /mnt/code/frontend_development/requirements.txt
+    # Saves scripts: /mnt/code/e007-frontend/scripts/
+    # Saves artifacts: /mnt/artifacts/e007-frontend/
+    # Creates: /mnt/code/e007-frontend/requirements.txt
     # Logs to MLflow: app code, Docker configs
     
     # Model Validator
     validation = model_validator.validate(model)
-    # Saves notebooks: /mnt/code/model_validation/notebooks/
-    # Saves scripts: /mnt/code/model_validation/scripts/
-    # Saves artifacts: /mnt/artifacts/model_validation/
-    # Creates: /mnt/code/model_validation/requirements.txt
+    # Saves notebooks: /mnt/code/e005-model-validation/notebooks/
+    # Saves scripts: /mnt/code/e005-model-validation/scripts/
+    # Saves artifacts: /mnt/artifacts/e005-model-validation/
+    # Creates: /mnt/code/e005-model-validation/requirements.txt
     # Logs to MLflow: validation reports, test results
 ```
