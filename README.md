@@ -2,7 +2,7 @@
 
 > A comprehensive collection of specialized Claude Code agents for building end-to-end machine learning demonstrations on the Domino Data Lab platform.
 
-![Domino ML Agents Overview](./assets/images/domino-ml-agents-overview.png)
+![Domino ML Agents Overview](./temp/domino-ml-agents-overview.png)
 
 ## Quick Start
 
@@ -33,7 +33,7 @@ This template provides **8 specialized agents** that work together to create pro
 | **MLOps Engineer** | Deployment | Production pipelines, monitoring |
 | **Frontend Developer** | UI/UX | Dashboards, apps, visualizations |
 
-![Agent Workflow](./assets/images/agent-workflow-diagram.png)
+![Agent Workflow](./temp/agent-workflow-diagram.png)
 
 ## Architecture
 
@@ -57,7 +57,7 @@ This template provides **8 specialized agents** that work together to create pro
 - **UI Frameworks**: Streamlit, Dash, Gradio, Panel, React/FastAPI
 - **Deployment**: FastAPI, Flask, Docker, Domino Flows
 
-![Technology Stack](./assets/images/tech-stack-visualization.png)
+![Technology Stack](./temp/tech-stack-visualization.png)
 
 ## Example Use Cases
 
@@ -85,7 +85,7 @@ This template provides **8 specialized agents** that work together to create pro
 - Privacy-preserving ML techniques
 - Clinical decision support interface
 
-![Use Cases](./assets/images/use-cases-grid.png)
+![Use Cases](./temp/use-cases-grid.png)
 
 ## Getting Started
 
@@ -118,7 +118,7 @@ Work with specific agents for targeted tasks:
 "Create a Streamlit app for model predictions with real-time updates"
 ```
 
-![Getting Started Flow](./assets/images/getting-started-flow.png)
+![Getting Started Flow](./temp/getting-started-flow.png)
 
 ## MLflow Integration
 
@@ -129,7 +129,7 @@ All agents automatically integrate with MLflow for comprehensive experiment trac
 - **Model registry** with signatures and input examples
 - **Artifact tracking** (models, plots, reports, data)
 
-![MLflow Dashboard](./assets/images/mlflow-dashboard-example.png)
+![MLflow Dashboard](./temp/mlflow-dashboard-example.png)
 
 ## Configuration
 
@@ -164,19 +164,19 @@ Each agent can be customized for specific requirements:
 ## Demo Gallery
 
 ### Customer Churn Prediction
-![Churn Demo](./assets/demos/churn-prediction-demo.gif)
+![Churn Demo](./temp/churn-prediction-demo.png)
 - Real-time prediction API
 - Interactive feature importance
 - Business impact calculator
 
 ### Fraud Detection System
-![Fraud Demo](./assets/demos/fraud-detection-demo.gif)
+![Fraud Demo](./temp/fraud-detection-demo.png)
 - Anomaly detection algorithms
 - Real-time alerting system
 - Investigation dashboard
 
 ### Recommendation Engine
-![Recommendation Demo](./assets/demos/recommendation-engine-demo.gif)
+![Recommendation Demo](./temp/recommendation-engine-demo.png)
 - Collaborative filtering
 - Content-based recommendations
 - A/B testing framework
@@ -201,7 +201,7 @@ Each agent can be customized for specific requirements:
 "Set up data drift detection and model performance monitoring"
 ```
 
-![Advanced Features](./assets/images/advanced-features-overview.png)
+![Advanced Features](./temp/advanced-features-overview.png)
 
 ## Contributing
 
@@ -225,7 +225,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 ---
 
 <div align="center">
-  <img src="./assets/images/domino-logo.png" alt="Domino Data Lab" width="200">
+  <img src="./temp/domino-logo.png" alt="Domino Data Lab" width="200">
   <br>
   <em>Built with love for the Domino Data Lab community</em>
 </div>
