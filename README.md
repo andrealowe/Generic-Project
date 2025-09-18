@@ -1,240 +1,342 @@
-# Domino ML Agents Template
+# ML Project Development Template
 
-> A comprehensive collection of specialized Claude Code agents for building end-to-end machine learning demonstrations on the Domino Data Lab platform.
+> A structured framework for building end-to-end machine learning projects on the Domino Data Lab platform
 
-![Domino ML Agents Overview](./.temp/domino-ml-agents-overview.png)
+![ML Project Overview](./.temp/ml-project-overview.png)
+
+## What You'll Build
+
+This template guides you through creating a complete, production-ready ML solution with:
+
+- **Automated data pipelines** with quality validation
+- **Advanced ML models** with comprehensive experimentation
+- **Governance compliance** across multiple frameworks
+- **Interactive dashboards** for stakeholder engagement
+- **Production deployment** with monitoring and CI/CD
+- **Full documentation** and reproducibility
+
+## Project Lifecycle
+
+### Phase 1: Business Understanding (e001)
+Define the problem, success metrics, and governance requirements
+- Stakeholder requirement analysis
+- Success criteria definition
+- Governance framework identification
+- ROI projections
+
+### Phase 2: Data Engineering (e002)
+Acquire, generate, or connect to your data sources
+- Data pipeline creation
+- Quality validation
+- Synthetic data generation (if needed)
+- Data versioning and lineage
+
+### Phase 3: Exploratory Analysis (e003)
+Understand your data and extract actionable insights
+- Statistical analysis
+- Feature discovery
+- Visualization creation
+- Hypothesis formation
+
+### Phase 4: Model Development (e004)
+Build and optimize machine learning models
+- Algorithm selection
+- Hyperparameter tuning
+- Cross-validation
+- MLflow experiment tracking
+
+### Phase 5: Model Validation (e005)
+Ensure model quality, fairness, and compliance
+- Performance testing
+- Bias detection
+- Robustness validation
+- Governance compliance checks
+
+### Phase 6: Deployment Pipeline (e006)
+Create production-ready deployment infrastructure
+- API development
+- Docker containerization
+- CI/CD pipeline setup
+- Monitoring configuration
+
+### Phase 7: User Interface (e007)
+Build interactive applications for model consumption
+- Dashboard creation
+- Real-time predictions
+- Business metrics tracking
+- User feedback loops
 
 ## Quick Start
 
-1. **Create a new Domino project** using this template
-2. **Launch Claude Code** in your Domino workspace
-3. **Start building** with one simple command:
+### Complete Project Generation
+
+Simply describe what you want to build:
 
 ```python
-# For a complete ML pipeline
-"Build an end-to-end customer churn prediction system with dashboard"
-
-# For quick prototyping
-"Create a fraud detection model demo with synthetic data"
+"Create a customer churn prediction system with real-time scoring"
 ```
 
-## What's Included
+This single command will:
+1. ✅ Generate synthetic customer data
+2. ✅ Perform comprehensive EDA
+3. ✅ Train multiple ML models
+4. ✅ Validate for bias and fairness
+5. ✅ Deploy production API
+6. ✅ Create interactive dashboard
+7. ✅ Set up monitoring
 
-This template provides **8 specialized agents** that work together to create production-ready ML solutions:
+### Targeted Development
 
-| Agent | Purpose | Key Capabilities |
-|-------|---------|-----------------|
-| **Master Project Manager** | Orchestration | End-to-end pipeline coordination |
-| **Data Wrangler** | Data Management | Data acquisition, quality, pipelines |
-| **Data Scientist** | Analysis & Insights | EDA, visualizations, feature engineering |
-| **Model Developer** | ML Development | Training, optimization, experimentation |
-| **Model Validator** | Quality Assurance | Performance validation, robustness testing |
-| **Business Analyst** | Requirements | Business-to-technical translation |
-| **MLOps Engineer** | Deployment | Production pipelines, monitoring |
-| **Frontend Developer** | UI/UX | Dashboards, apps, visualizations |
-
-![Agent Workflow](./.temp/agent-workflow-diagram.png)
-
-## Architecture
-
-### Directory Structure
-```
-/mnt/
-├── code/{stage}/           # Scripts, notebooks, requirements
-│   ├── notebooks/          # Jupyter notebooks for exploration
-│   ├── scripts/           # Production Python scripts
-│   └── requirements.txt   # Stage-specific dependencies
-├── artifacts/{stage}/      # Models, reports, visualizations
-│   ├── models/            # Saved model files
-│   └── visualizations/    # Generated plots and reports
-└── data/{project}/{stage}/ # Project-specific datasets
-```
-
-**Stage Directories:**
-- `e001-business-analysis` - Business requirements and analysis
-- `e002-data-wrangling` - Data acquisition and preparation
-- `e003-data-science` - Exploratory data analysis and insights
-- `e004-model-development` - Model training and optimization
-- `e005-model-validation` - Model testing and validation
-- `e006-mlops` - ML operations and deployment
-- `e007-frontend` - User interface and visualization
-
-### Technology Stack
-- **Python**: Primary language for all ML operations
-- **ML Frameworks**: scikit-learn, XGBoost, LightGBM, TensorFlow, PyTorch
-- **Experiment Tracking**: MLflow with comprehensive logging
-- **UI Frameworks**: Streamlit, Dash, Gradio, Panel, React/FastAPI
-- **Deployment**: FastAPI, Flask, Docker, Domino Flows
-
-![Technology Stack](./.temp/tech-stack-visualization.png)
-
-## Example Use Cases
-
-### Financial Services
-```python
-"Create a credit risk assessment model with regulatory compliance reporting"
-```
-- Synthetic financial data generation
-- Model interpretability and fairness validation
-- Regulatory compliance dashboards
-
-### E-commerce
-```python
-"Build a customer lifetime value prediction system with A/B testing"
-```
-- Customer segmentation analysis
-- Recommendation engine development
-- Real-time prediction API
-
-### Healthcare
-```python
-"Develop a patient readmission prediction model with privacy protection"
-```
-- Synthetic patient data generation
-- Privacy-preserving ML techniques
-- Clinical decision support interface
-
-![Use Cases](./.temp/use-cases-grid.png)
-
-## Getting Started
-
-### Option 1: Complete Pipeline
-Use the **Master Project Manager** for end-to-end automation:
+Focus on specific phases of your project:
 
 ```python
-"Build a complete fraud detection system for credit card transactions"
+# Start with data
+"Generate synthetic financial transaction data for fraud detection"
+
+# Focus on modeling
+"Build an ensemble model for this dataset optimizing for precision"
+
+# Create visualization
+"Build a Streamlit dashboard showing model predictions and explanations"
 ```
 
-This will:
-1. Generate synthetic transaction data
-2. Perform exploratory data analysis
-3. Train and optimize ML models
-4. Validate model performance and fairness
-5. Create deployment pipeline
-6. Build interactive dashboard
+## Project Structure
 
-### Option 2: Individual Agents
-Work with specific agents for targeted tasks:
+```
+Your Project/
+├── e001-business-analysis/     # Requirements & governance
+├── e002-data-wrangling/        # Data pipelines & quality
+├── e003-data-science/          # EDA & insights
+├── e004-model-development/     # ML training & optimization
+├── e005-model-validation/      # Testing & compliance
+├── e006-mlops/                 # Deployment & monitoring
+└── e007-frontend/              # Applications & dashboards
+```
+
+Each phase produces:
+- 📝 Production-ready code
+- 📊 Comprehensive artifacts
+- 📦 Dependencies (requirements.txt)
+- 📈 MLflow tracking
+- ✅ Validation reports
+
+## Example Projects
+
+### Credit Risk Assessment
+**Industry**: Financial Services
+**Complexity**: High
+**Governance**: NIST RMF, Model Risk Management
 
 ```python
-# Data acquisition
-"Generate synthetic customer data for churn prediction"
-
-# Model development
-"Train an XGBoost model for this dataset with hyperparameter tuning"
-
-# Dashboard creation
-"Create a Streamlit app for model predictions with real-time updates"
+"Build a credit risk model with explainability and regulatory reporting"
 ```
 
-![Getting Started Flow](./.temp/getting-started-flow.png)
+**Deliverables**:
+- Risk scoring API
+- Fairness validation report
+- Model explainability dashboard
+- Regulatory compliance documentation
+- A/B testing framework
+
+### Customer Lifetime Value
+**Industry**: E-commerce
+**Complexity**: Medium
+**Governance**: GDPR, Ethical AI
+
+```python
+"Create a CLV prediction system with customer segmentation"
+```
+
+**Deliverables**:
+- Segmentation analysis
+- Value prediction models
+- Marketing automation integration
+- ROI calculator
+- Performance monitoring
+
+### Demand Forecasting
+**Industry**: Retail
+**Complexity**: Medium
+**Governance**: Business Continuity
+
+```python
+"Develop a demand forecasting system with inventory optimization"
+```
+
+**Deliverables**:
+- Time series models
+- Inventory recommendations
+- Supply chain dashboard
+- Alert system
+- What-if analysis tools
+
+## Technology Stack
+
+### Core Technologies
+- **Python 3.8+** - Primary development language
+- **MLflow** - Experiment tracking and model registry
+- **Docker** - Containerization for deployment
+- **Git** - Version control
+
+### ML Frameworks
+- **scikit-learn** - Classical ML algorithms
+- **XGBoost/LightGBM** - Gradient boosting
+- **TensorFlow/PyTorch** - Deep learning
+- **statsmodels** - Statistical modeling
+
+### Deployment & UI
+- **FastAPI** - High-performance APIs
+- **Streamlit** - Quick interactive apps
+- **Dash/Gradio** - Advanced dashboards
+- **Domino Flows** - Workflow orchestration
+
+## Governance & Compliance
+
+Built-in support for enterprise governance frameworks:
+
+- ✅ **NIST Risk Management Framework**
+- ✅ **Model Risk Management V3**
+- ✅ **Ethical AI Guidelines**
+- ✅ **GDPR/CCPA Compliance**
+- ✅ **SOX Controls**
+
+Automated compliance features:
+- Model intake process
+- Approval workflows
+- Audit trails
+- Performance monitoring
+- Drift detection
 
 ## MLflow Integration
 
-All agents automatically integrate with MLflow for comprehensive experiment tracking:
-
-- **Parent-child run hierarchy** for complex workflows
-- **Automatic metric logging** (accuracy, precision, recall, etc.)
-- **Model registry** with signatures and input examples
-- **Artifact tracking** (models, plots, reports, data)
-
-![MLflow Dashboard](./.temp/mlflow-dashboard-example.png)
-
-## Configuration
-
-### Project Settings
-Configure your project by updating the settings in any agent interaction:
+Every project includes comprehensive MLflow tracking:
 
 ```python
-settings = {
-    "project": "customer_analytics",
-    "target_metric": "f1_score",
-    "deployment_strategy": "canary",
-    "ui_complexity": "medium",
-    "compliance_requirements": ["GDPR", "SOX"]
-}
+mlflow.set_experiment("your_project_name")
+
+# Automatic tracking of:
+- Parameters (hyperparameters, configs)
+- Metrics (accuracy, precision, recall, custom)
+- Models (serialized with signatures)
+- Artifacts (plots, reports, data samples)
+- Tags (version, stage, owner)
 ```
 
-### Agent Customization
-Each agent can be customized for specific requirements:
-- **Data Wrangler**: Custom data sources, quality rules
-- **Model Developer**: Specific algorithms, evaluation metrics
-- **Frontend Developer**: UI framework preferences, styling
-- **MLOps Engineer**: Deployment platforms, monitoring tools
+Parent-child run hierarchy for complex pipelines:
+- Master orchestration run
+- Nested stage runs
+- Experiment comparison
+- Model registry integration
 
-## Documentation
+## Getting Started
 
-- **[Agent Guide](./docs/agent-guide.md)**: Detailed agent capabilities and usage
-- **[Workflow Examples](./docs/workflow-examples.md)**: Step-by-step tutorials
-- **[API Reference](./docs/api-reference.md)**: Technical specifications
-- **[Best Practices](./docs/best-practices.md)**: Tips for optimal results
-- **[Troubleshooting](./docs/troubleshooting.md)**: Common issues and solutions
+### Prerequisites
+- Domino workspace access
+- Python environment
+- MLflow server (optional)
 
-## Demo Gallery
+### Installation
+```bash
+# Clone this template
+git clone <repository>
 
-### Customer Churn Prediction
-![Churn Demo](./.temp/churn-prediction-demo.png)
-- Real-time prediction API
-- Interactive feature importance
-- Business impact calculator
+# Install base dependencies
+pip install -r requirements.txt
+```
 
-### Fraud Detection System
-![Fraud Demo](./.temp/fraud-detection-demo.png)
-- Anomaly detection algorithms
-- Real-time alerting system
-- Investigation dashboard
+### Your First Project
+1. **Define your use case**
+   ```python
+   "I need a model to predict customer churn"
+   ```
 
-### Recommendation Engine
-![Recommendation Demo](./.temp/recommendation-engine-demo.png)
-- Collaborative filtering
-- Content-based recommendations
-- A/B testing framework
+2. **Watch the automated workflow**
+   - Data generation/acquisition
+   - Exploratory analysis
+   - Model training
+   - Validation
+   - Deployment
+
+3. **Customize as needed**
+   - Adjust model parameters
+   - Add custom features
+   - Modify UI components
 
 ## Advanced Features
 
-### Custom Data Sources
+### Custom Data Integration
 ```python
-# Connect to your data
-"Use the sales data from our Snowflake warehouse for demand forecasting"
+"Connect to our Snowflake warehouse and build a sales forecast model"
 ```
 
-### Multi-Model Ensembles
+### Ensemble Methods
 ```python
-# Advanced modeling
-"Create an ensemble of XGBoost, LightGBM, and neural networks"
+"Create a stacked ensemble combining XGBoost, Random Forest, and Neural Networks"
 ```
 
-### Automated Monitoring
+### Real-time Processing
 ```python
-# Production monitoring
-"Set up data drift detection and model performance monitoring"
+"Build a streaming anomaly detection system with Kafka integration"
 ```
 
-![Advanced Features](./.temp/advanced-features-overview.png)
+### AutoML Capabilities
+```python
+"Use AutoML to find the best model for this dataset"
+```
+
+## Best Practices
+
+### Project Planning
+- Define clear success metrics upfront
+- Identify governance requirements early
+- Plan for model monitoring from the start
+
+### Development
+- Use version control for all code
+- Track all experiments in MLflow
+- Document assumptions and decisions
+- Create reproducible pipelines
+
+### Deployment
+- Containerize applications
+- Implement health checks
+- Set up alerting
+- Plan for model updates
+
+## Support & Resources
+
+### Documentation
+- [Project Setup Guide](./docs/setup.md)
+- [Workflow Examples](./docs/workflows.md)
+- [API Reference](./docs/api.md)
+- [Troubleshooting](./docs/troubleshooting.md)
+
+### Community
+- [Domino Community Forum](https://community.domino.ai)
+- [GitHub Discussions](https://github.com/your-org/discussions)
+- [Slack Channel](https://domino-ml.slack.com)
+
+### Help
+- Email: support@domino.ai
+- Documentation: [docs.domino.ai](https://docs.domino.ai)
+- Issues: [GitHub Issues](https://github.com/your-org/issues)
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for:
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
+- Code contribution guidelines
+- Documentation improvements
 - Bug reports and feature requests
-- Agent improvements and new capabilities
-- Documentation updates
-- Example workflows and use cases
+- Community examples
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
-
-## Support
-
-- **Documentation**: [docs.domino.ai](https://docs.domino.ai)
-- **Community**: [Domino Community Forum](https://community.domino.ai)
-- **Issues**: [GitHub Issues](https://github.com/your-org/domino-ml-agents/issues)
-- **Contact**: support@domino.ai
+MIT License - see [LICENSE](./LICENSE) for details
 
 ---
 
 <div align="center">
   <img src="./.temp/domino-logo.png" alt="Domino Data Lab" width="200">
   <br>
-  <em>Built with love for the Domino Data Lab community</em>
+  <strong>Accelerate Model Development • Ensure Governance • Deploy with Confidence</strong>
 </div>
