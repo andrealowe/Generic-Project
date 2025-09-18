@@ -2,8 +2,6 @@
 
 > A structured framework for building end-to-end machine learning projects on the Domino Data Lab platform
 
-![ML Project Overview](./.temp/ml-project-overview.png)
-
 ## What You'll Build
 
 This template guides you through creating a complete, production-ready ML solution with:
@@ -306,10 +304,10 @@ pip install -r requirements.txt
 ## Support & Resources
 
 ### Documentation
-- [Project Setup Guide](./docs/setup.md)
-- [Workflow Examples](./docs/workflows.md)
-- [API Reference](./docs/api.md)
-- [Troubleshooting](./docs/troubleshooting.md)
+- Project Setup Guide (coming soon)
+- Workflow Examples (coming soon)
+- API Reference (coming soon)
+- Troubleshooting (coming soon)
 
 ### Community
 - [Domino Community Forum](https://community.domino.ai)
@@ -323,7 +321,7 @@ pip install -r requirements.txt
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
+We welcome contributions!
 - Code contribution guidelines
 - Documentation improvements
 - Bug reports and feature requests
@@ -331,12 +329,10 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## License
 
-MIT License - see [LICENSE](./LICENSE) for details
+MIT License
 
 ---
 
 <div align="center">
-  <img src="./.temp/domino-logo.png" alt="Domino Data Lab" width="200">
-  <br>
   <strong>Accelerate Model Development • Ensure Governance • Deploy with Confidence</strong>
 </div>
