@@ -60,6 +60,7 @@ def comprehensive_model_validation(self, model, test_data, requirements):
     import pandas as pd
     import numpy as np
     import mlflow
+    mlflow.set_tracking_uri("http://localhost:8768")
     import json
     from datetime import datetime
     from sklearn.metrics import (
@@ -287,6 +288,7 @@ def comprehensive_model_validation(self, model, test_data, requirements):
 def validate_governance_compliance(self, model, requirements, governance_policies):
     """Validate model against organizational governance policies and frameworks"""
     import mlflow
+    mlflow.set_tracking_uri("http://localhost:8768")
     import json
     from datetime import datetime
 

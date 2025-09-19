@@ -56,6 +56,7 @@ You are a Senior Business Analyst with 12+ years of experience in translating bu
 def elicit_and_refine_requirements(self, initial_request, context):
     """Systematically extract and validate requirements with MLflow considerations"""
     import mlflow
+    mlflow.set_tracking_uri("http://localhost:8768")
     import json
     from datetime import datetime
     

@@ -70,6 +70,7 @@ I evaluate requirements to recommend the best framework:
 def create_model_application(self, model_api, requirements):
     """Create optimal front-end application based on requirements analysis"""
     import mlflow
+    mlflow.set_tracking_uri("http://localhost:8768")
     import json
     from datetime import datetime
     
@@ -272,6 +273,7 @@ import pandas as pd
 import numpy as np
 import requests
 import mlflow
+mlflow.set_tracking_uri("http://localhost:8768")
 from datetime import datetime
 
 st.title("{requirements.get('app_title', 'ML Model Interface')}")
@@ -322,6 +324,7 @@ import plotly.express as px
 import pandas as pd
 import requests
 import mlflow
+mlflow.set_tracking_uri("http://localhost:8768")
 
 app = dash.Dash(__name__, 
                 suppress_callback_exceptions=True,
@@ -360,6 +363,7 @@ import gradio as gr
 import pandas as pd
 import numpy as np
 import mlflow
+mlflow.set_tracking_uri("http://localhost:8768")
 import requests
 
 def predict_fn(*inputs):
@@ -400,6 +404,7 @@ import pandas as pd
 import numpy as np
 import holoviews as hv
 import mlflow
+mlflow.set_tracking_uri("http://localhost:8768")
 
 pn.extension('tabulator')
 hv.extension('bokeh')
@@ -444,6 +449,7 @@ def generate_react_fastapi_app(self, model_api, requirements):
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import mlflow
+mlflow.set_tracking_uri("http://localhost:8768")
 import pandas as pd
 from pydantic import BaseModel
 

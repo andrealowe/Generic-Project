@@ -15,6 +15,7 @@ from sklearn.metrics import RocCurveDisplay
 # Import mlflow
 import mlflow
 import mlflow.sklearn
+mlflow.set_tracking_uri("http://localhost:8768")
 from mlflow.store.artifact.runs_artifact_repo import RunsArtifactRepository
 from mlflow.models.signature import infer_signature
 

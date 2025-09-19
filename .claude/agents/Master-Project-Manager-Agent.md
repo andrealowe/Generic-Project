@@ -67,6 +67,7 @@ When managing a project:
 def orchestrate_ml_pipeline(self, requirements):
     """Master orchestration with comprehensive error handling and MLflow tracking"""
     import mlflow
+    mlflow.set_tracking_uri("http://localhost:8768")
     import json
     from datetime import datetime
     
@@ -208,6 +209,7 @@ def orchestrate_ml_pipeline(self, requirements):
 def create_pipeline_wrapper(self, pipeline_output):
     """Create a PythonModel wrapper for the complete pipeline"""
     import mlflow.pyfunc
+    mlflow.set_tracking_uri("http://localhost:8768")
     
     class PipelineModel(mlflow.pyfunc.PythonModel):
         def __init__(self, components):
@@ -228,6 +230,7 @@ def create_pipeline_wrapper(self, pipeline_output):
 def orchestrate_governance_compliance(self, requirements, project_context):
     """Orchestrate governance compliance across all applicable frameworks"""
     import mlflow
+    mlflow.set_tracking_uri("http://localhost:8768")
     import json
     from datetime import datetime
 

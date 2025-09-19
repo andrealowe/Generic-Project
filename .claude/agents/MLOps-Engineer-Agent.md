@@ -59,6 +59,7 @@ def create_production_pipeline(self, components, requirements):
     """Build robust production pipeline with MLflow tracking and comprehensive safeguards"""
     import mlflow
     import mlflow.pyfunc
+    mlflow.set_tracking_uri("http://localhost:8768")
     import json
     from datetime import datetime
     
@@ -121,6 +122,7 @@ def create_production_pipeline(self, components, requirements):
             # Create API endpoint configuration
             api_config = f'''
 import mlflow.pyfunc
+mlflow.set_tracking_uri("http://localhost:8768")
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel

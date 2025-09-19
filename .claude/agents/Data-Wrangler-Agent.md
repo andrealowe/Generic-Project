@@ -57,6 +57,7 @@ def acquire_or_generate_data(self, specifications):
     import numpy as np
     import mlflow
     import mlflow.pandas
+    mlflow.set_tracking_uri("http://localhost:8768")
     from faker import Faker
     from sdv.synthetic_data import TabularSDG
     import json
@@ -130,14 +131,19 @@ def acquire_or_generate_data(self, specifications):
                     script_path = scripts_dir / "data_acquisition.py"
                     self.save_acquisition_script(specifications, script_path)
                     mlflow.log_artifact(str(script_path))
-                    
+
+                    # Create Jupyter notebook for data exploration
+                    notebook_path = notebooks_dir / "data_exploration.ipynb"
+                    self.create_data_exploration_notebook(real_data, specifications, notebook_path)
+                    mlflow.log_artifact(str(notebook_path))
+
                     # Create requirements.txt for this stage
                     requirements_path = code_dir / "requirements.txt"
                     with open(requirements_path, "w") as f:
                         f.write("pandas>=2.0.0\nnumpy>=1.24.0\nmlflow>=2.9.0\n")
-                        f.write("faker>=20.0.0\nsdv>=1.0.0\n")
+                        f.write("faker>=20.0.0\nsdv>=1.0.0\njupyter>=1.0.0\nnbformat>=5.7.0\n")
                     mlflow.log_artifact(str(requirements_path))
-                    
+
                     mlflow.set_tag("data_acquisition_status", "success")
                     return real_data
                     
@@ -193,7 +199,12 @@ def acquire_or_generate_data(self, specifications):
             script_path = scripts_dir / "synthetic_generation.py"
             self.save_generation_script(synthetic_params, script_path)
             mlflow.log_artifact(str(script_path))
-            
+
+            # Create Jupyter notebook for synthetic data exploration
+            notebook_path = notebooks_dir / "synthetic_data_exploration.ipynb"
+            self.create_data_exploration_notebook(synthetic_data, specifications, notebook_path)
+            mlflow.log_artifact(str(notebook_path))
+
             mlflow.set_tag("data_acquisition_status", "synthetic_success")
             return synthetic_data
             
@@ -204,4 +215,249 @@ def acquire_or_generate_data(self, specifications):
             mlflow.set_tag("data_acquisition_status", "fallback_cache")
             cached_path = data_dir / f"cached_{specifications.get('domain', 'default')}.parquet"
             return pd.read_parquet(cached_path)
+
+def create_data_exploration_notebook(self, data, specifications, notebook_path):
+    """Create a Jupyter notebook for data exploration and quality assessment"""
+    import nbformat as nbf
+    import json
+
+    # Create new notebook
+    nb = nbf.v4.new_notebook()
+
+    # Add title cell
+    data_type = "Synthetic" if specifications.get('synthetic_data', False) else "Real"
+    title_cell = nbf.v4.new_markdown_cell(f"""
+# {data_type} Data Exploration Report
+Project: {specifications.get('project', 'Demo')}
+Domain: {specifications.get('domain', 'General')}
+
+## Overview
+This notebook contains data exploration and quality assessment for the acquired dataset:
+- Dataset characteristics and structure
+- Data quality assessment
+- Initial exploration and insights
+- Recommendations for data preparation
+""")
+    nb.cells.append(title_cell)
+
+    # Add imports cell
+    imports_cell = nbf.v4.new_code_cell("""
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pathlib import Path
+import warnings
+warnings.filterwarnings('ignore')
+
+# Set plotting style
+plt.style.use('default')
+sns.set_palette("husl")
+""")
+    nb.cells.append(imports_cell)
+
+    # Add data loading section
+    project_name = specifications.get('project', 'demo')
+    data_load_cell = nbf.v4.new_code_cell(f"""
+# Load the acquired dataset
+data_path = "/mnt/data/{project_name}/data_acquisition/raw_data.parquet"
+if Path(data_path).exists():
+    df = pd.read_parquet(data_path)
+    print(f"Dataset loaded successfully!")
+    print(f"Shape: {{df.shape}}")
+    print(f"Memory usage: {{df.memory_usage(deep=True).sum() / 1024**2:.2f}} MB")
+else:
+    print("Dataset not found at expected location")
+
+# Display first few rows
+df.head()
+""")
+    nb.cells.append(data_load_cell)
+
+    # Add data overview section
+    overview_cell = nbf.v4.new_markdown_cell("## Dataset Overview")
+    nb.cells.append(overview_cell)
+
+    overview_code_cell = nbf.v4.new_code_cell("""
+# Basic dataset information
+print("Dataset Info:")
+print(f"Number of rows: {len(df)}")
+print(f"Number of columns: {len(df.columns)}")
+print(f"Column names: {list(df.columns)}")
+print("\\nData types:")
+print(df.dtypes)
+print("\\nBasic statistics:")
+df.describe()
+""")
+    nb.cells.append(overview_code_cell)
+
+    # Add data quality section
+    quality_cell = nbf.v4.new_markdown_cell("## Data Quality Assessment")
+    nb.cells.append(quality_cell)
+
+    quality_code_cell = nbf.v4.new_code_cell("""
+# Check for missing values
+print("Missing values:")
+missing_counts = df.isnull().sum()
+missing_percentages = (missing_counts / len(df)) * 100
+missing_df = pd.DataFrame({
+    'Missing Count': missing_counts,
+    'Missing Percentage': missing_percentages
+})
+print(missing_df[missing_df['Missing Count'] > 0])
+
+# Check for duplicates
+duplicates = df.duplicated().sum()
+print(f"\\nDuplicate rows: {duplicates}")
+
+# Data type distribution
+print("\\nData type distribution:")
+print(df.dtypes.value_counts())
+""")
+    nb.cells.append(quality_code_cell)
+
+    # Add visualizations section
+    viz_cell = nbf.v4.new_markdown_cell("## Data Visualizations")
+    nb.cells.append(viz_cell)
+
+    # Numerical data distributions
+    num_viz_cell = nbf.v4.new_code_cell("""
+# Distribution of numerical columns
+numeric_cols = df.select_dtypes(include=[np.number]).columns
+if len(numeric_cols) > 0:
+    # Plot distributions
+    n_cols = min(4, len(numeric_cols))
+    n_rows = (len(numeric_cols) + n_cols - 1) // n_cols
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 4*n_rows))
+    if n_rows == 1:
+        axes = axes if len(numeric_cols) > 1 else [axes]
+    else:
+        axes = axes.flatten()
+
+    for i, col in enumerate(numeric_cols):
+        if i < len(axes):
+            df[col].hist(bins=30, ax=axes[i], alpha=0.7)
+            axes[i].set_title(f'Distribution of {col}')
+            axes[i].set_xlabel(col)
+            axes[i].set_ylabel('Frequency')
+
+    # Hide empty subplots
+    for j in range(i+1, len(axes)):
+        axes[j].set_visible(False)
+
+    plt.tight_layout()
+    plt.show()
+else:
+    print("No numeric columns found for distribution plots")
+""")
+    nb.cells.append(num_viz_cell)
+
+    # Categorical data overview
+    cat_viz_cell = nbf.v4.new_code_cell("""
+# Categorical data overview
+categorical_cols = df.select_dtypes(include=['object', 'category']).columns
+if len(categorical_cols) > 0:
+    print("Categorical columns summary:")
+    for col in categorical_cols[:5]:  # Limit to first 5 categorical columns
+        print(f"\\n{col}:")
+        print(f"  Unique values: {df[col].nunique()}")
+        print(f"  Most frequent: {df[col].mode().iloc[0] if not df[col].empty else 'N/A'}")
+        if df[col].nunique() <= 10:
+            print(f"  Value counts:")
+            print(df[col].value_counts().head())
+else:
+    print("No categorical columns found")
+""")
+    nb.cells.append(cat_viz_cell)
+
+    # Add correlation analysis for numeric data
+    corr_cell = nbf.v4.new_code_cell("""
+# Correlation analysis for numeric columns
+if len(numeric_cols) > 1:
+    plt.figure(figsize=(10, 8))
+    correlation_matrix = df[numeric_cols].corr()
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0, square=True)
+    plt.title('Feature Correlation Matrix')
+    plt.tight_layout()
+    plt.show()
+
+    # Find highly correlated pairs
+    high_corr_pairs = []
+    for i in range(len(correlation_matrix.columns)):
+        for j in range(i+1, len(correlation_matrix.columns)):
+            corr_val = correlation_matrix.iloc[i, j]
+            if abs(corr_val) > 0.7:
+                high_corr_pairs.append((correlation_matrix.columns[i], correlation_matrix.columns[j], corr_val))
+
+    if high_corr_pairs:
+        print("\\nHighly correlated pairs (|correlation| > 0.7):")
+        for col1, col2, corr in high_corr_pairs:
+            print(f"  {col1} - {col2}: {corr:.3f}")
+    else:
+        print("\\nNo highly correlated pairs found")
+else:
+    print("Insufficient numeric columns for correlation analysis")
+""")
+    nb.cells.append(corr_cell)
+
+    # Add data preparation recommendations
+    recommendations_cell = nbf.v4.new_markdown_cell("## Data Preparation Recommendations")
+    nb.cells.append(recommendations_cell)
+
+    recommendations_code_cell = nbf.v4.new_code_cell("""
+# Generate data preparation recommendations
+recommendations = []
+
+# Missing value recommendations
+if missing_counts.sum() > 0:
+    recommendations.append("Handle missing values using appropriate imputation strategies")
+
+# Duplicate recommendations
+if duplicates > 0:
+    recommendations.append(f"Remove {duplicates} duplicate rows")
+
+# High cardinality categorical variables
+for col in categorical_cols:
+    if df[col].nunique() > len(df) * 0.5:
+        recommendations.append(f"Consider encoding strategy for high-cardinality column: {col}")
+
+# Skewed distributions
+for col in numeric_cols:
+    skewness = df[col].skew()
+    if abs(skewness) > 2:
+        recommendations.append(f"Consider transformation for skewed column: {col} (skewness: {skewness:.2f})")
+
+# Display recommendations
+print("Data Preparation Recommendations:")
+for i, rec in enumerate(recommendations, 1):
+    print(f"{i}. {rec}")
+
+if not recommendations:
+    print("No major data quality issues detected!")
+""")
+    nb.cells.append(recommendations_code_cell)
+
+    # Add conclusion
+    conclusion_cell = nbf.v4.new_markdown_cell("""
+## Conclusion
+
+This data exploration report provides:
+- Dataset structure and basic statistics
+- Data quality assessment
+- Visualization of key patterns
+- Recommendations for data preparation
+
+Next steps:
+1. Implement recommended data cleaning steps
+2. Feature engineering based on patterns observed
+3. Proceed to exploratory data analysis for modeling insights
+""")
+    nb.cells.append(conclusion_cell)
+
+    # Write notebook to file
+    with open(notebook_path, 'w') as f:
+        nbf.write(nb, f)
+
+    return notebook_path
 ```

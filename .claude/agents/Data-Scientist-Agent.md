@@ -60,6 +60,7 @@ def perform_comprehensive_eda(self, dataset, business_context):
     import seaborn as sns
     import matplotlib.pyplot as plt
     import mlflow
+    mlflow.set_tracking_uri("http://localhost:8768")
     import json
     import os
     from pathlib import Path
@@ -209,11 +210,14 @@ def perform_comprehensive_eda(self, dataset, business_context):
                 mlflow.log_artifact(str(dashboard_path))
                 
             except Exception as e:
-                # Fallback to static Jupyter notebook
-                notebook_path = notebooks_dir / "eda_report.ipynb"
-                notebook = self.create_jupyter_report(eda_results, notebook_path)
-                eda_results['notebook_path'] = str(notebook_path)
-                mlflow.log_artifact(str(notebook_path))
+                # Dashboard creation failed, note the error
+                mlflow.log_param("dashboard_creation_error", str(e))
+
+            # Always create Jupyter notebook for demonstration
+            notebook_path = notebooks_dir / "eda_report.ipynb"
+            notebook = self.create_jupyter_report(eda_results, notebook_path)
+            eda_results['notebook_path'] = str(notebook_path)
+            mlflow.log_artifact(str(notebook_path))
             
             # Create requirements.txt for this stage
             requirements_path = code_dir / "requirements.txt"
@@ -221,6 +225,7 @@ def perform_comprehensive_eda(self, dataset, business_context):
                 f.write("pandas>=2.0.0\nnumpy>=1.24.0\nmlflow>=2.9.0\n")
                 f.write("plotly>=5.17.0\nseaborn>=0.12.0\nmatplotlib>=3.7.0\n")
                 f.write("pandas-profiling>=3.6.0\nscipy>=1.10.0\n")
+                f.write("jupyter>=1.0.0\nnbformat>=5.7.0\n")
             mlflow.log_artifact(str(requirements_path))
             
             # Save complete EDA results
@@ -239,4 +244,161 @@ def perform_comprehensive_eda(self, dataset, business_context):
             eda_results = self.minimal_pandas_eda(dataset)
     
     return eda_results
+
+def create_jupyter_report(self, eda_results, notebook_path):
+    """Create a comprehensive Jupyter notebook for EDA demonstration"""
+    import json
+    import nbformat as nbf
+
+    # Create new notebook
+    nb = nbf.v4.new_notebook()
+
+    # Add title cell
+    title_cell = nbf.v4.new_markdown_cell(f"""
+# Exploratory Data Analysis Report
+Generated on: {eda_results.get('timestamp', 'N/A')}
+Project: {eda_results.get('project_name', 'Demo')}
+
+## Overview
+This notebook contains comprehensive exploratory data analysis results including:
+- Dataset statistics and characteristics
+- Data visualizations and patterns
+- Insights and recommendations
+- Data quality assessment
+""")
+    nb.cells.append(title_cell)
+
+    # Add imports cell
+    imports_cell = nbf.v4.new_code_cell("""
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
+from pathlib import Path
+import json
+
+# Set plotting style
+plt.style.use('default')
+sns.set_palette("husl")
+""")
+    nb.cells.append(imports_cell)
+
+    # Add data loading section
+    data_load_cell = nbf.v4.new_code_cell(f"""
+# Load the dataset for analysis
+data_path = "/mnt/data/{eda_results.get('project_name', 'demo')}/eda/eda_dataset.parquet"
+if Path(data_path).exists():
+    df = pd.read_parquet(data_path)
+    print(f"Dataset shape: {{df.shape}}")
+    print(f"Columns: {{list(df.columns)}}")
+    df.head()
+else:
+    print("Dataset not found - please check data path")
+""")
+    nb.cells.append(data_load_cell)
+
+    # Add statistics section
+    if eda_results.get('statistics'):
+        stats_cell = nbf.v4.new_markdown_cell("## Dataset Statistics")
+        nb.cells.append(stats_cell)
+
+        stats_code_cell = nbf.v4.new_code_cell("""
+# Display basic statistics
+print("Dataset Summary:")
+print(df.describe())
+print("\\nData Types:")
+print(df.dtypes)
+print("\\nMissing Values:")
+print(df.isnull().sum())
+""")
+        nb.cells.append(stats_code_cell)
+
+    # Add visualizations section
+    viz_cell = nbf.v4.new_markdown_cell("## Data Visualizations")
+    nb.cells.append(viz_cell)
+
+    # Distribution plots
+    dist_cell = nbf.v4.new_code_cell("""
+# Distribution plots for numeric columns
+numeric_cols = df.select_dtypes(include=[np.number]).columns
+if len(numeric_cols) > 0:
+    fig, axes = plt.subplots(nrows=(len(numeric_cols)+1)//2, ncols=2, figsize=(15, 5*((len(numeric_cols)+1)//2)))
+    if len(numeric_cols) == 1:
+        axes = [axes]
+    elif len(numeric_cols) == 2:
+        axes = axes.flatten()
+    else:
+        axes = axes.flatten()
+
+    for i, col in enumerate(numeric_cols[:8]):  # Limit to first 8 columns
+        if i < len(axes):
+            df[col].hist(bins=30, ax=axes[i])
+            axes[i].set_title(f'Distribution of {col}')
+            axes[i].set_xlabel(col)
+            axes[i].set_ylabel('Frequency')
+
+    # Hide empty subplots
+    for j in range(i+1, len(axes)):
+        axes[j].set_visible(False)
+
+    plt.tight_layout()
+    plt.show()
+""")
+    nb.cells.append(dist_cell)
+
+    # Correlation heatmap
+    corr_cell = nbf.v4.new_code_cell("""
+# Correlation heatmap
+if len(numeric_cols) > 1:
+    plt.figure(figsize=(12, 8))
+    correlation_matrix = df[numeric_cols].corr()
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0)
+    plt.title('Feature Correlation Matrix')
+    plt.tight_layout()
+    plt.show()
+""")
+    nb.cells.append(corr_cell)
+
+    # Add insights section
+    if eda_results.get('insights'):
+        insights_cell = nbf.v4.new_markdown_cell("## Key Insights")
+        nb.cells.append(insights_cell)
+
+        insights_text = "\\n".join([f"- {insight}" for insight in eda_results['insights'][:10]])
+        insights_content_cell = nbf.v4.new_markdown_cell(insights_text)
+        nb.cells.append(insights_content_cell)
+
+    # Add recommendations section
+    if eda_results.get('recommendations'):
+        rec_cell = nbf.v4.new_markdown_cell("## Recommendations for Model Development")
+        nb.cells.append(rec_cell)
+
+        rec_text = "\\n".join([f"- {rec}" for rec in eda_results['recommendations'][:10]])
+        rec_content_cell = nbf.v4.new_markdown_cell(rec_text)
+        nb.cells.append(rec_content_cell)
+
+    # Add conclusion
+    conclusion_cell = nbf.v4.new_markdown_cell("""
+## Conclusion
+
+This EDA report provides comprehensive analysis of the dataset including:
+- Statistical summaries and data characteristics
+- Visualization of data distributions and relationships
+- Key insights and patterns discovered
+- Recommendations for further analysis and modeling
+
+Next steps:
+1. Feature engineering based on insights
+2. Model selection and training
+3. Performance validation and testing
+""")
+    nb.cells.append(conclusion_cell)
+
+    # Write notebook to file
+    with open(notebook_path, 'w') as f:
+        nbf.write(nb, f)
+
+    return notebook_path
 ```
