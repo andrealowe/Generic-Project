@@ -1,10 +1,10 @@
 # Domino Data Lab Claude Code Agents
 
-## 📋 Overview
+## Overview
 
 This collection of Claude Code agents provides comprehensive support for building end-to-end machine learning demonstrations on the Domino Data Lab platform. Each agent specializes in a specific aspect of the ML lifecycle, and they work together to create production-ready solutions.
 
-## 🎯 Agent Roles & Responsibilities
+## Agent Roles & Responsibilities
 
 ### Core Orchestration
 - **Master-Project-Manager-Agent** (purple): Orchestrates all other agents, manages workflows, and ensures project success
@@ -26,7 +26,7 @@ This collection of Claude Code agents provides comprehensive support for buildin
 - **Agent-Interaction-Protocol**: Reference for how agents communicate with each other
 - **Example-Demonstration-Flows**: Sample workflows showing file organization and MLflow integration
 
-## 🔄 Typical Workflow
+## Typical Workflow
 
 ```mermaid
 graph TD
@@ -41,7 +41,7 @@ graph TD
     I --> J[Complete Solution]
 ```
 
-## 📁 File Organization
+## File Organization
 
 All agents follow a standardized directory structure:
 
@@ -52,7 +52,7 @@ All agents follow a standardized directory structure:
 └── data/{project}/{stage}/ # Project-specific datasets
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Basic Usage
 
@@ -80,7 +80,7 @@ All agents follow a standardized directory structure:
 "Deploy this model with monitoring and A/B testing"
 ```
 
-## 🔧 Key Features
+## Key Features
 
 ### MLflow Integration
 - All agents log experiments, metrics, and artifacts to MLflow
@@ -100,7 +100,7 @@ All agents follow a standardized directory structure:
 - Retry logic with exponential backoff
 - Clear error messages and remediation steps
 
-## 📊 Output Standards
+## Output Standards
 
 Each agent produces:
 - Python notebooks with documentation
@@ -110,7 +110,7 @@ Each agent produces:
 - JSON test data for validation
 - Comprehensive documentation
 
-## 🎯 Best Practices
+## Best Practices
 
 1. **Always specify project name** for proper organization
 2. **Use descriptive experiment names** in MLflow
@@ -118,7 +118,7 @@ Each agent produces:
 4. **Enable MLflow tracking** for reproducibility
 5. **Test with small datasets first** before scaling
 
-## 💡 Tips for Sales Engineers
+## Tips for Sales Engineers
 
 - Start with the Master-Project-Manager-Agent for complete demos
 - Use individual agents for specific customer pain points
@@ -126,7 +126,7 @@ Each agent produces:
 - Always generate test data with the Data-Wrangler-Agent
 - Use Model-Validator-Agent to showcase governance capabilities
 
-## 📝 Notes
+## Notes
 
 - All agents prioritize Python for consistency
 - Agents automatically handle directory creation
@@ -134,7 +134,7 @@ Each agent produces:
 - Error handling ensures demos never fail completely
 - Each agent can work independently or as part of a pipeline
 
-## 🔗 Dependencies
+## Dependencies
 
 Core Python packages required:
 - pandas, numpy, scikit-learn
@@ -144,7 +144,7 @@ Core Python packages required:
 - xgboost, lightgbm
 - plotly, seaborn, matplotlib
 
-## 📚 Additional Resources
+## Additional Resources
 
 - Review `Agent-Interaction-Protocol.md` for communication patterns
 - Check `Example-Demonstration-Flows-With-File-Structure.md` for workflow examples

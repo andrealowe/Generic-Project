@@ -63,6 +63,13 @@ I evaluate requirements to recommend the best framework:
 - Performance benchmarks
 - Accessibility compliance reports
 - Deployment configurations for chosen stack
+
+## Professional Formatting Guidelines
+- Use professional, business-appropriate language in all outputs
+- Avoid emojis, emoticons, or decorative symbols in documentation
+- Use standard markdown formatting for structure and emphasis
+- Maintain formal tone appropriate for enterprise environments
+- Use checkmarks (✓) and X marks (✗) for status indicators only when necessary
 ```
 
 ### Key Methods
@@ -281,7 +288,7 @@ st.title("{requirements.get('app_title', 'ML Model Interface')}")
 # Streamlit-specific optimizations
 st.set_page_config(
     page_title="{requirements.get('app_title', 'ML Model')}",
-    page_icon="🤖",
+    page_icon="⚙",
     layout="{requirements.get('layout', 'wide')}",
     initial_sidebar_state="{requirements.get('sidebar', 'expanded')}"
 )

@@ -60,6 +60,13 @@ When managing a project:
 - Risk assessments and mitigation plans
 - Resource utilization reports
 - Success criteria validation
+
+## Professional Formatting Guidelines
+- Use professional, business-appropriate language in all outputs
+- Avoid emojis, emoticons, or decorative symbols in documentation
+- Use standard markdown formatting for structure and emphasis
+- Maintain formal tone appropriate for enterprise environments
+- Use checkmarks (✓) and X marks (✗) for status indicators only when necessary
 ```
 
 ### Key Methods
@@ -435,25 +442,25 @@ def create_governance_dashboard(self, governance_results):
     </head>
     <body>
         <div class="header">
-            <h1>🏛️ ML Project Governance Dashboard</h1>
+            <h1>ML Project Governance Dashboard</h1>
             <p>Comprehensive compliance tracking across organizational frameworks</p>
             <p>Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
         </div>
 
         <div class="status-overview">
             <div class="status-card">
-                <h3>📊 Overall Status</h3>
+                <h3>Overall Status</h3>
                 <h2 style="color: {'#28a745' if governance_results['overall_status'] == 'PASSED' else '#ffc107'};">
                     {governance_results['overall_status']}
                 </h2>
             </div>
             <div class="status-card">
-                <h3>📋 Frameworks</h3>
+                <h3>Frameworks</h3>
                 <h2>{len(governance_results['frameworks'])}</h2>
                 <p>Applicable governance frameworks</p>
             </div>
             <div class="status-card">
-                <h3>👥 Approvers</h3>
+                <h3>Approvers</h3>
                 <h2>{len(governance_results['approval_workflow'].get('required_approvers', []))}</h2>
                 <p>Required approval groups</p>
             </div>
@@ -502,7 +509,7 @@ def create_governance_dashboard(self, governance_results):
                 <ul>
             """
             for approver in result['required_approvers']:
-                html_dashboard += f"<li>👤 {approver}</li>"
+                html_dashboard += f"<li>• {approver}</li>"
             html_dashboard += "</ul></div>"
 
         html_dashboard += "</div>"
@@ -510,7 +517,7 @@ def create_governance_dashboard(self, governance_results):
     # Add approval workflow section
     html_dashboard += """
     <div class="framework-section">
-        <h2>🔄 Approval Workflow</h2>
+        <h2>Approval Workflow</h2>
         <p>Coordinated approval process across all applicable frameworks</p>
 
         <h3>Approval Stages:</h3>
@@ -531,7 +538,7 @@ def create_governance_dashboard(self, governance_results):
     </div>
 
     <div class="framework-section">
-        <h2>📞 Contact Information</h2>
+        <h2>Contact Information</h2>
         <h3>Approval Organizations:</h3>
         <ul>
             <li><strong>Modeling:</strong> modeling-review, modeling-practitioners, modeling-leadership</li>
