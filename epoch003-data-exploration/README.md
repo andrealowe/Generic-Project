@@ -1,18 +1,25 @@
-# Data Science
-
-Exploratory data analysis and insight generation.
+# Epoch 003: Data Exploration
 
 ## Purpose
-- Perform exploratory data analysis (EDA)
-- Generate statistical insights and visualizations
-- Identify patterns, relationships, and anomalies
-- Make recommendations for model development
+Conduct comprehensive exploratory data analysis to understand data characteristics, identify patterns, and generate actionable insights.
 
-## Outputs
-- EDA notebooks and reports
-- Statistical analysis results
-- Data visualizations and plots
-- Feature analysis and recommendations
+## Assumptions
+Cleaned datasets from data wrangling phase provide sufficient quality for meaningful analysis.
+
+## Findings
+Key data patterns and relationships identified through statistical analysis with feature distributions and correlations documented.
+
+## Metrics
+Insight generation rate, data coverage completeness percentage, and visualization effectiveness score.
+
+## Successes
+Comprehensive EDA notebooks created with statistical summaries, feature importance rankings established, and actionable recommendations provided.
+
+## Failures
+Some complex relationships may require advanced statistical techniques and domain expert availability could limit validation.
+
+## Next Steps
+Proceed to model development using insights to guide feature selection and engineering.
 
 ## Agent
 Use `Data-Scientist-Agent` for tasks in this stage.

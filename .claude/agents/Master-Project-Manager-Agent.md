@@ -115,7 +115,7 @@ def orchestrate_ml_pipeline(self, requirements):
                         mlflow.set_tag("stage_name", stage.name)
                         mlflow.set_tag("agent_type", stage.agent_type)
                         
-                        agent = self.select_agent(stage.type)
+                        agent = self.select_agent(stage.agent_type)
                         
                         # Pass MLflow run context to agent
                         stage.task['mlflow_run_id'] = stage_run.info.run_id
@@ -233,6 +233,426 @@ def create_pipeline_wrapper(self, pipeline_output):
             return self.components['postprocessor'].transform(predictions)
     
     return PipelineModel(pipeline_output['components'])
+
+def create_execution_plan(self, requirements):
+    """Create comprehensive execution plan with epoch-based stages"""
+    import json
+    from datetime import datetime
+
+    class ExecutionStage:
+        def __init__(self, name, agent_type, task, timeout=3600, dependencies=None):
+            self.name = name
+            self.agent_type = agent_type
+            self.task = task
+            self.timeout = timeout
+            self.dependencies = dependencies or []
+
+    class ExecutionPlan:
+        def __init__(self):
+            self.stages = []
+            self.project_name = requirements.get('project', 'ml_demo')
+            self.created_at = datetime.now().isoformat()
+
+        def add_stage(self, stage):
+            self.stages.append(stage)
+
+        def to_dict(self):
+            return {
+                'project_name': self.project_name,
+                'created_at': self.created_at,
+                'stages': [
+                    {
+                        'name': stage.name,
+                        'agent_type': stage.agent_type,
+                        'task': stage.task,
+                        'timeout': stage.timeout,
+                        'dependencies': stage.dependencies
+                    }
+                    for stage in self.stages
+                ]
+            }
+
+    plan = ExecutionPlan()
+
+    # Epoch 1: Research and Business Analysis
+    plan.add_stage(ExecutionStage(
+        name="epoch001_research_analysis",
+        agent_type="Business-Analyst-Agent",
+        task={
+            'stage': 'research_and_requirements',
+            'requirements': requirements,
+            'research_directory': '/mnt/code/epoch001-research-analysis-planning/',
+            'output_directory': '/mnt/code/e001-business-analysis/',
+            'artifacts_directory': '/mnt/artifacts/e001-business-analysis/',
+            'conduct_research': True,
+            'generate_pdf_report': True,
+            'regulatory_assessment': True
+        },
+        timeout=1800
+    ))
+
+    # Confirmation checkpoint after Epoch 1
+    plan.add_stage(ExecutionStage(
+        name="checkpoint001_review",
+        agent_type="checkpoint",
+        task={
+            'stage': 'confirmation_checkpoint',
+            'message': 'Research and business analysis complete. Please review the research report and requirements. Continue to data wrangling?',
+            'artifacts_to_review': [
+                '/mnt/artifacts/e001-business-analysis/research_report.pdf',
+                '/mnt/code/e001-business-analysis/requirements/requirements_document.md'
+            ]
+        },
+        dependencies=["epoch001_research_analysis"]
+    ))
+
+    # Epoch 2: Data Wrangling
+    plan.add_stage(ExecutionStage(
+        name="epoch002_data_wrangling",
+        agent_type="Data-Wrangler-Agent",
+        task={
+            'stage': 'data_acquisition_and_preparation',
+            'requirements': requirements,
+            'output_directory': '/mnt/code/e002-data-wrangling/',
+            'artifacts_directory': '/mnt/artifacts/e002-data-wrangling/',
+            'data_directory': '/mnt/data/{}/e002-data-wrangling/'.format(requirements.get('project', 'default')),
+            'use_research_context': True
+        },
+        dependencies=["checkpoint001_review"]
+    ))
+
+    # Checkpoint after Epoch 2
+    plan.add_stage(ExecutionStage(
+        name="checkpoint002_review",
+        agent_type="checkpoint",
+        task={
+            'stage': 'confirmation_checkpoint',
+            'message': 'Data wrangling complete. Please review the data quality report and prepared datasets. Continue to data exploration?',
+            'artifacts_to_review': [
+                '/mnt/artifacts/e002-data-wrangling/',
+                '/mnt/code/e002-data-wrangling/'
+            ]
+        },
+        dependencies=["epoch002_data_wrangling"]
+    ))
+
+    # Epoch 3: Data Science and Exploration
+    plan.add_stage(ExecutionStage(
+        name="epoch003_data_science",
+        agent_type="Data-Scientist-Agent",
+        task={
+            'stage': 'exploratory_data_analysis',
+            'requirements': requirements,
+            'data_directory': '/mnt/data/{}/e002-data-wrangling/'.format(requirements.get('project', 'default')),
+            'output_directory': '/mnt/code/e003-data-science/',
+            'artifacts_directory': '/mnt/artifacts/e003-data-science/'
+        },
+        dependencies=["checkpoint002_review"]
+    ))
+
+    # Checkpoint after Epoch 3
+    plan.add_stage(ExecutionStage(
+        name="checkpoint003_review",
+        agent_type="checkpoint",
+        task={
+            'stage': 'confirmation_checkpoint',
+            'message': 'Data exploration complete. Please review the EDA insights and feature analysis. Continue to model development?',
+            'artifacts_to_review': [
+                '/mnt/artifacts/e003-data-science/',
+                '/mnt/code/e003-data-science/'
+            ]
+        },
+        dependencies=["epoch003_data_science"]
+    ))
+
+    # Epoch 4: Model Development
+    plan.add_stage(ExecutionStage(
+        name="epoch004_model_development",
+        agent_type="Model-Developer-Agent",
+        task={
+            'stage': 'model_training_and_optimization',
+            'requirements': requirements,
+            'data_directory': '/mnt/data/{}/e002-data-wrangling/'.format(requirements.get('project', 'default')),
+            'output_directory': '/mnt/code/e004-model-development/',
+            'artifacts_directory': '/mnt/artifacts/e004-model-development/',
+            'use_research_recommendations': True
+        },
+        dependencies=["checkpoint003_review"]
+    ))
+
+    # Checkpoint after Epoch 4
+    plan.add_stage(ExecutionStage(
+        name="checkpoint004_review",
+        agent_type="checkpoint",
+        task={
+            'stage': 'confirmation_checkpoint',
+            'message': 'Model development complete. Please review the trained models and performance metrics. Continue to model testing?',
+            'artifacts_to_review': [
+                '/mnt/artifacts/e004-model-development/',
+                '/mnt/code/e004-model-development/'
+            ]
+        },
+        dependencies=["epoch004_model_development"]
+    ))
+
+    # Epoch 5: Model Testing
+    plan.add_stage(ExecutionStage(
+        name="epoch005_model_testing",
+        agent_type="Model-Tester-Agent",
+        task={
+            'stage': 'comprehensive_model_testing',
+            'requirements': requirements,
+            'model_path': '/mnt/artifacts/e004-model-development/best_model/',
+            'output_directory': '/mnt/code/e005-model-testing/',
+            'artifacts_directory': '/mnt/artifacts/e005-model-testing/',
+            'test_requirements': {
+                'functional_requirements': requirements.get('functional_requirements', {}),
+                'performance_requirements': requirements.get('performance_requirements', {}),
+                'compliance_requirements': requirements.get('compliance_requirements', {}),
+                'fairness_requirements': requirements.get('fairness_requirements', {})
+            }
+        },
+        dependencies=["checkpoint004_review"]
+    ))
+
+    # Checkpoint after Epoch 5
+    plan.add_stage(ExecutionStage(
+        name="checkpoint005_review",
+        agent_type="checkpoint",
+        task={
+            'stage': 'confirmation_checkpoint',
+            'message': 'Model testing complete. Please review the test results and validation reports. Continue to MLOps deployment?',
+            'artifacts_to_review': [
+                '/mnt/artifacts/e005-model-testing/test_report.md',
+                '/mnt/artifacts/e005-model-testing/'
+            ]
+        },
+        dependencies=["epoch005_model_testing"]
+    ))
+
+    # Epoch 6: MLOps Engineering
+    plan.add_stage(ExecutionStage(
+        name="epoch006_mlops",
+        agent_type="MLOps-Engineer-Agent",
+        task={
+            'stage': 'deployment_and_monitoring',
+            'requirements': requirements,
+            'model_path': '/mnt/artifacts/e004-model-development/best_model/',
+            'test_results': '/mnt/artifacts/e005-model-testing/',
+            'output_directory': '/mnt/code/e006-mlops/',
+            'artifacts_directory': '/mnt/artifacts/e006-mlops/',
+            'deployment_architecture': requirements.get('deployment_architecture', 'production')
+        },
+        dependencies=["checkpoint005_review"]
+    ))
+
+    # Checkpoint after Epoch 6
+    plan.add_stage(ExecutionStage(
+        name="checkpoint006_review",
+        agent_type="checkpoint",
+        task={
+            'stage': 'confirmation_checkpoint',
+            'message': 'MLOps deployment complete. Please review the deployment configuration and monitoring setup. Continue to frontend development?',
+            'artifacts_to_review': [
+                '/mnt/artifacts/e006-mlops/',
+                '/mnt/code/e006-mlops/'
+            ]
+        },
+        dependencies=["epoch006_mlops"]
+    ))
+
+    # Epoch 7: Frontend Development
+    plan.add_stage(ExecutionStage(
+        name="epoch007_frontend",
+        agent_type="Front-End-Developer-Agent",
+        task={
+            'stage': 'application_development',
+            'requirements': requirements,
+            'model_api': '/mnt/artifacts/e006-mlops/api_config.json',
+            'output_directory': '/mnt/code/e007-frontend/',
+            'artifacts_directory': '/mnt/artifacts/e007-frontend/',
+            'use_research_recommendations': True
+        },
+        dependencies=["checkpoint006_review"]
+    ))
+
+    # Final checkpoint
+    plan.add_stage(ExecutionStage(
+        name="checkpoint007_final",
+        agent_type="checkpoint",
+        task={
+            'stage': 'final_review',
+            'message': 'Complete ML pipeline finished. Please review all deliverables and confirm project completion.',
+            'artifacts_to_review': [
+                '/mnt/artifacts/e001-business-analysis/research_report.pdf',
+                '/mnt/artifacts/e005-model-testing/test_report.md',
+                '/mnt/artifacts/e007-frontend/',
+                '/mnt/code/e007-frontend/'
+            ]
+        },
+        dependencies=["epoch007_frontend"]
+    ))
+
+    return plan
+
+def select_agent(self, agent_type):
+    """Select appropriate agent based on type"""
+    agent_registry = {
+        'Business-Analyst-Agent': self.get_business_analyst_agent(),
+        'Data-Wrangler-Agent': self.get_data_wrangler_agent(),
+        'Data-Scientist-Agent': self.get_data_scientist_agent(),
+        'Model-Developer-Agent': self.get_model_developer_agent(),
+        'Model-Tester-Agent': self.get_model_tester_agent(),
+        'MLOps-Engineer-Agent': self.get_mlops_engineer_agent(),
+        'Front-End-Developer-Agent': self.get_frontend_developer_agent(),
+        'checkpoint': self.get_checkpoint_handler()
+    }
+
+    if agent_type in agent_registry:
+        return agent_registry[agent_type]
+    else:
+        raise ValueError(f"Unknown agent type: {agent_type}")
+
+def get_checkpoint_handler(self):
+    """Handle checkpoint confirmations"""
+    class CheckpointHandler:
+        def execute(self, task, timeout=None):
+            print(f"\n{'='*60}")
+            print("EPOCH CHECKPOINT")
+            print(f"{'='*60}")
+            print(f"Stage: {task.get('stage', 'Unknown')}")
+            print(f"\nMessage: {task.get('message', 'Review checkpoint')}")
+
+            if task.get('artifacts_to_review'):
+                print(f"\nArtifacts to review:")
+                for artifact in task['artifacts_to_review']:
+                    print(f"  - {artifact}")
+
+            print(f"\n{'='*60}")
+
+            # In a real implementation, this would wait for user confirmation
+            # For demo purposes, we'll return a continue signal
+            response = input("\nType 'continue' to proceed to next epoch, or 'stop' to halt: ")
+
+            return {
+                'status': 'confirmed' if response.lower() == 'continue' else 'stopped',
+                'user_response': response,
+                'timestamp': datetime.now().isoformat()
+            }
+
+    return CheckpointHandler()
+
+def get_business_analyst_agent(self):
+    """Get Business Analyst Agent with research capabilities"""
+    class BusinessAnalystAgentProxy:
+        def execute(self, task, timeout=None):
+            # This would invoke the actual Business-Analyst-Agent
+            # For now, return a mock response showing research capabilities
+            return {
+                'stage': task['stage'],
+                'research_conducted': task.get('conduct_research', False),
+                'research_report_path': task.get('artifacts_directory', '') + '/research_report.pdf',
+                'requirements_documented': True,
+                'regulatory_assessment_complete': task.get('regulatory_assessment', False),
+                'compliance_frameworks_identified': ['GDPR', 'NIST RMF', 'Model Risk Management'],
+                'technology_recommendations': ['scikit-learn', 'XGBoost', 'MLflow'],
+                'deployment_architectures': 3,
+                'status': 'completed'
+            }
+
+    return BusinessAnalystAgentProxy()
+
+def get_model_tester_agent(self):
+    """Get Model Tester Agent"""
+    class ModelTesterAgentProxy:
+        def execute(self, task, timeout=None):
+            # This would invoke the actual Model-Tester-Agent
+            return {
+                'stage': task['stage'],
+                'functional_tests': {'status': 'PASSED', 'coverage': 0.95},
+                'performance_tests': {'status': 'PASSED', 'latency_p95': 85},
+                'edge_case_tests': {'status': 'PASSED_WITH_WARNINGS', 'failure_modes': 2},
+                'fairness_tests': {'status': 'PASSED', 'bias_detected': False},
+                'robustness_tests': {'status': 'PASSED', 'adversarial_resilience': 0.88},
+                'compliance_tests': {'status': 'PASSED', 'regulatory_compliance': True},
+                'overall_status': 'PASSED',
+                'test_report_path': task.get('artifacts_directory', '') + '/test_report.md',
+                'production_ready': True
+            }
+
+    return ModelTesterAgentProxy()
+
+def get_data_wrangler_agent(self):
+    """Get Data Wrangler Agent"""
+    class DataWranglerAgentProxy:
+        def execute(self, task, timeout=None):
+            return {
+                'stage': task['stage'],
+                'data_acquired': True,
+                'data_quality_score': 0.92,
+                'synthetic_data_generated': True,
+                'status': 'completed'
+            }
+
+    return DataWranglerAgentProxy()
+
+def get_data_scientist_agent(self):
+    """Get Data Scientist Agent"""
+    class DataScientistAgentProxy:
+        def execute(self, task, timeout=None):
+            return {
+                'stage': task['stage'],
+                'eda_completed': True,
+                'insights_generated': 15,
+                'feature_importance_analyzed': True,
+                'status': 'completed'
+            }
+
+    return DataScientistAgentProxy()
+
+def get_model_developer_agent(self):
+    """Get Model Developer Agent"""
+    class ModelDeveloperAgentProxy:
+        def execute(self, task, timeout=None):
+            return {
+                'stage': task['stage'],
+                'models_trained': 5,
+                'best_model_score': 0.94,
+                'best_model_run_id': 'run_12345',
+                'best_model_name': 'XGBoost_optimized',
+                'hyperparameter_tuning_completed': True,
+                'status': 'completed'
+            }
+
+    return ModelDeveloperAgentProxy()
+
+def get_mlops_engineer_agent(self):
+    """Get MLOps Engineer Agent"""
+    class MLOpsEngineerAgentProxy:
+        def execute(self, task, timeout=None):
+            return {
+                'stage': task['stage'],
+                'deployment_completed': True,
+                'monitoring_configured': True,
+                'api_endpoint': 'http://localhost:8000/predict',
+                'status': 'completed'
+            }
+
+    return MLOpsEngineerAgentProxy()
+
+def get_frontend_developer_agent(self):
+    """Get Frontend Developer Agent"""
+    class FrontendDeveloperAgentProxy:
+        def execute(self, task, timeout=None):
+            return {
+                'stage': task['stage'],
+                'application_created': True,
+                'ui_framework': 'Streamlit',
+                'deployment_ready': True,
+                'status': 'completed'
+            }
+
+    return FrontendDeveloperAgentProxy()
 
 def orchestrate_governance_compliance(self, requirements, project_context):
     """Orchestrate governance compliance across all applicable frameworks"""
