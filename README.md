@@ -1,338 +1,304 @@
 # ML Project Development Template
 
-> A structured framework for building end-to-end machine learning projects on the Domino Data Lab platform
+> A structured framework for building end-to-end machine learning projects with comprehensive research, testing, and compliance capabilities
 
 ## What You'll Build
 
 This template guides you through creating a complete, production-ready ML solution with:
 
+- **Research-driven approach** with regulatory compliance assessment
 - **Automated data pipelines** with quality validation
 - **Advanced ML models** with comprehensive experimentation
-- **Governance compliance** across multiple frameworks
+- **Rigorous testing suite** including fairness and robustness validation
 - **Interactive dashboards** for stakeholder engagement
 - **Production deployment** with monitoring and CI/CD
 - **Full documentation** and reproducibility
 
 ## Project Lifecycle
 
-### Phase 1: Business Understanding (e001)
-Define the problem, success metrics, and governance requirements
-- Stakeholder requirement analysis
-- Success criteria definition
-- Governance framework identification
-- ROI projections
+### Epoch 001: Research Analysis and Planning
+Conduct comprehensive preliminary research including regulatory landscape and technology recommendations
+- Domain-specific research and historical analysis
+- Regulatory compliance assessment (GDPR, HIPAA, NIST RMF)
+- Technology stack recommendations
+- Deployment architecture options (3 variations)
+- Comprehensive PDF research report generation
 
-### Phase 2: Data Engineering (e002)
-Acquire, generate, or connect to your data sources
-- Data pipeline creation
-- Quality validation
-- Synthetic data generation (if needed)
-- Data versioning and lineage
+### Epoch 002: Data Wrangling
+Acquire, clean, and prepare high-quality datasets with privacy-compliant approaches
+- Data sourcing and synthetic data generation
+- Quality validation and cleaning pipelines
+- Privacy-compliant data handling
+- Data versioning and lineage tracking
 
-### Phase 3: Exploratory Analysis (e003)
-Understand your data and extract actionable insights
-- Statistical analysis
-- Feature discovery
-- Visualization creation
-- Hypothesis formation
+### Epoch 003: Data Exploration
+Conduct comprehensive exploratory data analysis for actionable insights
+- Statistical analysis and pattern identification
+- Feature correlation and importance analysis
+- Visualization creation and insight generation
+- Data quality assessment and recommendations
 
-### Phase 4: Model Development (e004)
-Build and optimize machine learning models
-- Algorithm selection
-- Hyperparameter tuning
-- Cross-validation
-- MLflow experiment tracking
+### Epoch 004: Model Development
+Design, train, and optimize ML models using research-informed strategies
+- Algorithm selection based on research recommendations
+- Hyperparameter optimization (Grid, Random, Bayesian)
+- Cross-validation and performance tracking
+- MLflow experiment management
 
-### Phase 5: Model Validation (e005)
-Ensure model quality, fairness, and compliance
-- Performance testing
-- Bias detection
-- Robustness validation
-- Governance compliance checks
+### Epoch 005: Model Testing
+Comprehensive testing suite ensuring production readiness and compliance
+- **Functional validation** against business requirements
+- **Performance testing** including latency and throughput
+- **Edge case testing** for robustness validation
+- **Fairness and bias testing** for ethical compliance
+- **Adversarial robustness** testing
+- **Regulatory compliance** validation
+- Detailed test reports with pass/fail criteria
 
-### Phase 6: Deployment Pipeline (e006)
-Create production-ready deployment infrastructure
-- API development
-- Docker containerization
-- CI/CD pipeline setup
-- Monitoring configuration
+### Epoch 006: Application Development
+Create user-facing applications with optimal technology selection
+- UI framework selection based on research
+- Interactive dashboard development
+- Real-time prediction interfaces
+- Integration with validated models
 
-### Phase 7: User Interface (e007)
-Build interactive applications for model consumption
-- Dashboard creation
-- Real-time predictions
-- Business metrics tracking
-- User feedback loops
+### Epoch 007: Retrospective
+Project review and lessons learned documentation
+- Success metrics evaluation
+- Process improvement identification
+- Best practices documentation
+- Organizational knowledge capture
+
+## Agent Architecture
+
+### Master Project Manager Agent
+Orchestrates complete workflows with epoch-based checkpoints requiring user confirmation between stages
+
+### Specialized Agents
+
+**Business-Analyst-Agent** *(Enhanced with Research Capabilities)*
+- Comprehensive domain research including regulatory assessment
+- Technology stack recommendations
+- PDF research report generation
+- Business requirements translation
+
+**Data-Wrangler-Agent**
+- Data acquisition and synthetic generation
+- Quality assessment and cleaning
+- Privacy-compliant data handling
+
+**Data-Scientist-Agent**
+- Exploratory data analysis
+- Statistical insights and visualizations
+- Feature engineering recommendations
+
+**Model-Developer-Agent**
+- ML model training and optimization
+- Algorithm selection and tuning
+- Experiment tracking and management
+
+**Model-Tester-Agent** *(New Comprehensive Testing)*
+- Functional, performance, and edge case testing
+- Fairness, bias, and robustness validation
+- Regulatory compliance verification
+- Production readiness certification
+
+**MLOps-Engineer-Agent**
+- Deployment pipeline creation
+- Monitoring and alerting setup
+- CI/CD integration
+
+**Front-End-Developer-Agent**
+- Application development with technology recommendations
+- Interactive dashboard creation
+- User experience optimization
+
+## Checkpoint System
+
+**Automated Confirmation Points**
+After each epoch, the system stops and requires user confirmation:
+- Review artifacts and outputs
+- Validate progress against objectives
+- Confirm readiness to proceed
+- Option to halt or continue pipeline
 
 ## Quick Start
 
-### Complete Project Generation
-
-Simply describe what you want to build:
+### Complete Project Generation with Research
 
 ```python
-"Create a customer churn prediction system with real-time scoring"
+"Create a credit risk model with regulatory compliance for financial services"
 ```
 
-This single command will:
-1. ✅ Generate synthetic customer data
-2. ✅ Perform comprehensive EDA
-3. ✅ Train multiple ML models
-4. ✅ Validate for bias and fairness
-5. ✅ Deploy production API
-6. ✅ Create interactive dashboard
-7. ✅ Set up monitoring
-
-### Targeted Development
-
-Focus on specific phases of your project:
-
-```python
-# Start with data
-"Generate synthetic financial transaction data for fraud detection"
-
-# Focus on modeling
-"Build an ensemble model for this dataset optimizing for precision"
-
-# Create visualization
-"Build a Streamlit dashboard showing model predictions and explanations"
-```
+This command will:
+1. ✅ Conduct regulatory research (NIST RMF, Basel III, Model Risk Management)
+2. ✅ Generate research report with technology recommendations
+3. ✅ **CHECKPOINT**: Review research findings
+4. ✅ Generate/acquire compliant financial data
+5. ✅ **CHECKPOINT**: Validate data quality
+6. ✅ Perform comprehensive EDA with compliance focus
+7. ✅ **CHECKPOINT**: Review insights and patterns
+8. ✅ Train models using research-recommended algorithms
+9. ✅ **CHECKPOINT**: Evaluate model performance
+10. ✅ Execute comprehensive testing suite including bias detection
+11. ✅ **CHECKPOINT**: Review test results and compliance
+12. ✅ Deploy with monitoring and governance tracking
+13. ✅ **CHECKPOINT**: Confirm deployment readiness
+14. ✅ Create regulatory-compliant dashboard
+15. ✅ **FINAL CHECKPOINT**: Project completion review
 
 ## Project Structure
 
 ```
 Your Project/
-├── e001-business-analysis/     # Requirements & governance
-├── e002-data-wrangling/        # Data pipelines & quality
-├── e003-data-science/          # EDA & insights
-├── e004-model-development/     # ML training & optimization
-├── e005-model-validation/      # Testing & compliance
-├── e006-mlops/                 # Deployment & monitoring
-└── e007-frontend/              # Applications & dashboards
+├── epoch001-research-analysis-planning/    # Research & regulatory assessment
+├── epoch002-data-wrangling/               # Data pipelines & quality
+├── epoch003-data-exploration/             # EDA & insights
+├── epoch004-model-development/            # ML training & optimization
+├── epoch005-model-testing/                # Comprehensive testing suite
+├── epoch006-application-development/      # Applications & dashboards
+├── epoch007-retrospective/               # Project review & lessons learned
+└── artifacts/                           # Research reports, test results, models
+    ├── e001-business-analysis/           # Research PDFs, compliance docs
+    ├── e002-data-wrangling/             # Data quality reports
+    ├── e003-data-science/               # EDA insights, visualizations
+    ├── e004-model-development/          # Model artifacts, experiments
+    ├── e005-model-testing/              # Test reports, compliance validation
+    ├── e006-application-development/    # UI artifacts, deployment configs
+    └── e007-retrospective/              # Project summary, lessons learned
 ```
 
-Each phase produces:
-- 📝 Production-ready code
-- 📊 Comprehensive artifacts
-- 📦 Dependencies (requirements.txt)
-- 📈 MLflow tracking
-- ✅ Validation reports
+## Enhanced Testing Capabilities
 
-## Example Projects
+### Comprehensive Model Validation
+- **Functional Testing**: Basic prediction validation and format compliance
+- **Performance Testing**: Latency (P95), throughput, resource utilization
+- **Edge Case Testing**: Missing values, outliers, boundary conditions
+- **Fairness Testing**: Demographic parity, equal opportunity, disparate impact
+- **Robustness Testing**: Adversarial attacks, data drift, noise resilience
+- **Compliance Testing**: Regulatory adherence, audit trail validation
 
-### Credit Risk Assessment
-**Industry**: Financial Services
-**Complexity**: High
-**Governance**: NIST RMF, Model Risk Management
-
-```python
-"Build a credit risk model with explainability and regulatory reporting"
-```
-
-**Deliverables**:
-- Risk scoring API
-- Fairness validation report
-- Model explainability dashboard
-- Regulatory compliance documentation
-- A/B testing framework
-
-### Customer Lifetime Value
-**Industry**: E-commerce
-**Complexity**: Medium
-**Governance**: GDPR, Ethical AI
-
-```python
-"Create a CLV prediction system with customer segmentation"
-```
-
-**Deliverables**:
-- Segmentation analysis
-- Value prediction models
-- Marketing automation integration
-- ROI calculator
-- Performance monitoring
-
-### Demand Forecasting
-**Industry**: Retail
-**Complexity**: Medium
-**Governance**: Business Continuity
-
-```python
-"Develop a demand forecasting system with inventory optimization"
-```
-
-**Deliverables**:
-- Time series models
-- Inventory recommendations
-- Supply chain dashboard
-- Alert system
-- What-if analysis tools
+### Test Reporting
+- Professional markdown reports with pass/fail criteria
+- Performance benchmarking with threshold validation
+- Compliance scorecards for regulatory frameworks
+- Production readiness checklists
+- Risk assessment and mitigation recommendations
 
 ## Technology Stack
 
 ### Core Technologies
 - **Python 3.8+** - Primary development language
 - **MLflow** - Experiment tracking and model registry
+- **ReportLab** - Professional PDF report generation
 - **Docker** - Containerization for deployment
-- **Git** - Version control
 
-### ML Frameworks
+### ML Frameworks (Research-Informed Selection)
 - **scikit-learn** - Classical ML algorithms
-- **XGBoost/LightGBM** - Gradient boosting
+- **XGBoost/LightGBM** - Gradient boosting (recommended for tabular data)
 - **TensorFlow/PyTorch** - Deep learning
-- **statsmodels** - Statistical modeling
+- **Optuna/Hyperopt** - Hyperparameter optimization
 
-### Deployment & UI
+### Testing & Validation
+- **SHAP/LIME** - Model explainability
+- **Evidently AI** - Model monitoring and drift detection
+- **Great Expectations** - Data quality validation
+- **Alibi** - Adversarial testing and explanations
+
+### Deployment & UI (Technology-Specific Recommendations)
 - **FastAPI** - High-performance APIs
-- **Streamlit** - Quick interactive apps
-- **Dash/Gradio** - Advanced dashboards
-- **Domino Flows** - Workflow orchestration
+- **Streamlit** - Quick interactive prototypes
+- **React + FastAPI** - Production applications
+- **Domino Apps** - Enterprise deployment platform
 
 ## Governance & Compliance
 
-Built-in support for enterprise governance frameworks:
-
+### Automated Compliance Assessment
+Research phase automatically identifies applicable frameworks:
 - ✅ **NIST Risk Management Framework**
 - ✅ **Model Risk Management V3**
 - ✅ **Ethical AI Guidelines**
 - ✅ **GDPR/CCPA Compliance**
-- ✅ **SOX Controls**
+- ✅ **HIPAA** (healthcare data)
+- ✅ **SOX Controls** (financial)
 
-Automated compliance features:
-- Model intake process
-- Approval workflows
-- Audit trails
-- Performance monitoring
-- Drift detection
+### Compliance Features
+- Regulatory requirement mapping
+- Automated compliance testing
+- Audit trail generation
+- Model card creation
+- Bias and fairness validation
+- Explainability requirements
 
-## MLflow Integration
+## Professional Reporting
 
-Every project includes comprehensive MLflow tracking:
+### Research Reports
+- Executive summary with regulatory landscape
+- Technology stack justifications
+- Deployment architecture comparisons
+- Risk assessment and mitigation strategies
+- Professional PDF generation for stakeholder review
 
-```python
-mlflow.set_experiment("your_project_name")
-
-# Automatic tracking of:
-- Parameters (hyperparameters, configs)
-- Metrics (accuracy, precision, recall, custom)
-- Models (serialized with signatures)
-- Artifacts (plots, reports, data samples)
-- Tags (version, stage, owner)
-```
-
-Parent-child run hierarchy for complex pipelines:
-- Master orchestration run
-- Nested stage runs
-- Experiment comparison
-- Model registry integration
+### Test Reports
+- Comprehensive validation results
+- Performance benchmarking
+- Compliance verification
+- Production readiness assessment
+- Risk mitigation recommendations
 
 ## Getting Started
 
 ### Prerequisites
 - Domino workspace access
 - Python environment
-- MLflow server (optional)
+- Basic understanding of ML concepts
 
-### Installation
-```bash
-# Clone this template
-git clone <repository>
-
-# Install base dependencies
-pip install -r requirements.txt
-```
-
-### Your First Project
-1. **Define your use case**
+### Your First Project with Research
+1. **Define your use case and domain**
    ```python
-   "I need a model to predict customer churn"
+   "Build a healthcare prediction model for patient risk assessment"
    ```
 
-2. **Watch the automated workflow**
-   - Data generation/acquisition
-   - Exploratory analysis
-   - Model training
-   - Validation
-   - Deployment
+2. **Review generated research report**
+   - Regulatory requirements (HIPAA, FDA guidelines)
+   - Technology recommendations
+   - Deployment options analysis
 
-3. **Customize as needed**
-   - Adjust model parameters
-   - Add custom features
-   - Modify UI components
-
-## Advanced Features
-
-### Custom Data Integration
-```python
-"Connect to our Snowflake warehouse and build a sales forecast model"
-```
-
-### Ensemble Methods
-```python
-"Create a stacked ensemble combining XGBoost, Random Forest, and Neural Networks"
-```
-
-### Real-time Processing
-```python
-"Build a streaming anomaly detection system with Kafka integration"
-```
-
-### AutoML Capabilities
-```python
-"Use AutoML to find the best model for this dataset"
-```
+3. **Proceed through epoch checkpoints**
+   - Confirm each stage before proceeding
+   - Review artifacts and validate progress
+   - Make adjustments as needed
 
 ## Best Practices
 
-### Project Planning
-- Define clear success metrics upfront
-- Identify governance requirements early
-- Plan for model monitoring from the start
+### Research-Driven Development
+- Always start with comprehensive domain research
+- Identify regulatory requirements early
+- Use technology recommendations from research phase
+- Plan for compliance throughout development
 
-### Development
-- Use version control for all code
-- Track all experiments in MLflow
-- Document assumptions and decisions
-- Create reproducible pipelines
+### Quality Assurance
+- Comprehensive testing at model level
+- Automated bias and fairness validation
+- Performance benchmarking against requirements
+- Regulatory compliance verification
 
-### Deployment
-- Containerize applications
-- Implement health checks
-- Set up alerting
-- Plan for model updates
+### Professional Documentation
+- Research reports for stakeholder alignment
+- Test reports for production readiness
+- Compliance documentation for audits
+- Retrospective analysis for continuous improvement
 
 ## Support & Resources
 
 ### Documentation
-- Project Setup Guide (coming soon)
-- Workflow Examples (coming soon)
-- API Reference (coming soon)
-- Troubleshooting (coming soon)
-
-### Community
-- [Domino Community Forum](https://community.domino.ai)
-- [GitHub Discussions](https://github.com/your-org/discussions)
-- [Slack Channel](https://domino-ml.slack.com)
-
-### Help
-- Email: support@domino.ai
-- Documentation: [docs.domino.ai](https://docs.domino.ai)
-- Issues: [GitHub Issues](https://github.com/your-org/issues)
-
-## Contributing
-
-We welcome contributions!
-- Code contribution guidelines
-- Documentation improvements
-- Bug reports and feature requests
-- Community examples
-
-## License
-
-MIT License
+- Agent interaction protocols
+- Compliance framework guides
+- Testing methodology documentation
+- Technology selection criteria
 
 ---
 
 <div align="center">
-  <strong>Accelerate Model Development • Ensure Governance • Deploy with Confidence</strong>
+  <strong>Research-Driven • Rigorously Tested • Compliance-Ready • Production-Proven</strong>
 </div>
