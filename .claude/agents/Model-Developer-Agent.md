@@ -25,13 +25,17 @@ You are a Senior ML Engineer with 12+ years of experience in developing, optimiz
 4. Optimize for specific business metrics
 5. Ensure model reproducibility
 6. Generate model documentation
+7. Register best models to Domino Model Registry
+8. Create model cards with performance metrics and specifications
 
 ## Domino Integration Points
 - Experiment tracking with MLflow
 - Distributed computing for training
 - GPU utilization for deep learning
-- Model registry integration
+- Model registry integration with versioning
 - Hyperparameter sweep orchestration
+- Automated model card generation
+- Best model selection and registration
 
 ## Error Handling Approach
 - Implement checkpointing for long training runs
@@ -588,4 +592,216 @@ Next steps:
         nbf.write(nb, f)
 
     return notebook_path
+
+def register_best_model_to_registry(self, experiment_name, model_name, requirements):
+    """Register the best model from an experiment to Domino Model Registry"""
+    import mlflow
+    mlflow.set_tracking_uri("http://localhost:8768")
+    from mlflow.tracking import MlflowClient
+    import os
+    from pathlib import Path
+
+    # Initialize MLflow client
+    client = MlflowClient()
+
+    try:
+        # 1. Get experiment and find best run
+        experiment = mlflow.get_experiment_by_name(experiment_name)
+        if experiment is None:
+            raise ValueError(f"Experiment '{experiment_name}' not found")
+
+        experiment_id = experiment.experiment_id
+
+        # 2. Search for best run based on primary metric
+        primary_metric = requirements.get('primary_metric', 'accuracy')
+        best_runs = client.search_runs(
+            experiment_ids=[experiment_id],
+            filter_string="",
+            order_by=[f"metrics.{primary_metric} DESC"],
+            max_results=1
+        )
+
+        if not best_runs:
+            raise ValueError(f"No runs found in experiment '{experiment_name}'")
+
+        best_run = best_runs[0]
+        run_id = best_run.info.run_id
+        best_metric_value = best_run.data.metrics.get(primary_metric, 0)
+
+        print(f"Best run ID: {run_id[:8]}...")
+        print(f"Best {primary_metric}: {best_metric_value:.4f}")
+
+        # 3. Register model name if it doesn't exist
+        risk_level = requirements.get('risk_level', 'medium')
+        tags = {'risk-level': risk_level}
+
+        try:
+            client.create_registered_model(model_name, tags=tags)
+            print(f"Created new registered model: {model_name}")
+        except:
+            print(f"Model '{model_name}' already registered")
+
+        # 4. Update model description with Model Card
+        model_card_content = self.generate_model_card(
+            best_run=best_run,
+            model_name=model_name,
+            requirements=requirements
+        )
+
+        # Check for external model card template
+        project_dir = requirements.get('project_dir', '/mnt')
+        model_card_path = os.path.join(project_dir, 'Model-Card-Template.md')
+
+        if os.path.exists(model_card_path):
+            with open(model_card_path, 'r') as file:
+                markdown_description = file.read()
+            print(f"Loaded model card from: {model_card_path}")
+        else:
+            markdown_description = model_card_content
+            print("Using generated model card")
+
+        client.update_registered_model(model_name, markdown_description)
+
+        # 5. Extract comprehensive metrics and parameters
+        best_run_metrics = best_run.data.metrics
+        best_run_params = best_run.data.params
+
+        # 6. Create model version tags
+        model_tags = {
+            "Category": requirements.get('category', 'Classification'),
+            "Framework": requirements.get('framework', 'scikit-learn'),
+            "Environment": requirements.get('environment', 'Production'),
+            "Status": "Candidate",
+            "Validation": "Pending"
+        }
+
+        # Add key metrics to tags
+        for metric_name, metric_value in best_run_metrics.items():
+            if metric_value is not None:
+                model_tags[f"metric.{metric_name}"] = f"{metric_value:.4f}"
+
+        # 7. Create model specifications
+        model_specs = {
+            # Performance metrics
+            f"mlflow.domino.specs.Best {primary_metric}": f"{best_metric_value:.4f}",
+
+            # Reproducibility information
+            "mlflow.domino.specs.MLflow Run ID": f"{run_id}",
+            "mlflow.domino.specs.Experiment Name": experiment_name,
+            "mlflow.domino.specs.Training Framework": requirements.get('framework', 'scikit-learn'),
+        }
+
+        # Add hyperparameters from best run
+        for param_name, param_value in best_run_params.items():
+            if param_value is not None:
+                model_specs[f"mlflow.domino.specs.{param_name}"] = str(param_value)
+
+        # 8. Create model version from best run
+        model_uri = f"runs:/{run_id}/model"
+        description = requirements.get('version_description', f'Model trained with best {primary_metric}')
+
+        mv = client.create_model_version(
+            name=model_name,
+            source=model_uri,
+            run_id=run_id,
+            description=description,
+            tags=model_tags
+        )
+
+        print(f"Created model version {mv.version} for '{model_name}'")
+
+        # 9. Set model specifications as registered model tags
+        for key, value in model_specs.items():
+            client.set_registered_model_tag(model_name, key, value)
+
+        registered_model = client.get_registered_model(model_name)
+
+        return {
+            'model_name': model_name,
+            'version': mv.version,
+            'run_id': run_id,
+            'best_metric': best_metric_value,
+            'registered_model': registered_model
+        }
+
+    except Exception as e:
+        print(f"Error registering model: {e}")
+        raise
+
+def generate_model_card(self, best_run, model_name, requirements):
+    """Generate a model card template for the registered model"""
+
+    best_run_metrics = best_run.data.metrics
+    best_run_params = best_run.data.params
+    run_id = best_run.info.run_id
+
+    primary_metric = requirements.get('primary_metric', 'accuracy')
+    best_metric_value = best_run_metrics.get(primary_metric, 0)
+
+    project_name = requirements.get('project', 'ML Project')
+    problem_type = requirements.get('problem_type', 'Classification')
+    framework = requirements.get('framework', 'scikit-learn')
+
+    model_card = f"""# {model_name}
+
+## Mission Brief
+
+This is a **{framework}** model optimized for {problem_type.lower()} with focus on {primary_metric} performance.
+
+### Operational Capabilities
+- **Base Framework**: {framework}
+- **Problem Type**: {problem_type}
+- **Primary Metric**: {primary_metric}
+- **Best Performance**: {best_metric_value:.4f}
+
+## Intelligence Assessment
+
+### Model Performance
+- **{primary_metric}**: {best_metric_value:.4f}
+"""
+
+    # Add other key metrics
+    key_metrics = ['precision', 'recall', 'f1_score', 'auc', 'accuracy']
+    for metric in key_metrics:
+        if metric in best_run_metrics and metric != primary_metric:
+            model_card += f"- **{metric}**: {best_run_metrics[metric]:.4f}\n"
+
+    model_card += f"""
+### Data Sources
+- **Project**: {project_name}
+- **Training Experiment**: {best_run.info.experiment_id}
+
+## Technical Implementation
+
+### Training Parameters
+"""
+
+    # Add key hyperparameters
+    for param_name, param_value in best_run_params.items():
+        model_card += f"- **{param_name}**: {param_value}\n"
+
+    model_card += f"""
+### Model Registry
+- **Name**: {model_name}
+- **Run ID**: {run_id}
+- **Framework**: {framework}
+- **Storage**: Domino Model Registry
+
+## Expected Performance
+
+### Mission Objectives
+- **Primary Goal**: Optimize {primary_metric}
+- **Performance Target**: {best_metric_value:.4f}
+
+### Assessment Protocols
+- Comprehensive evaluation metrics tracked
+- MLflow experiment logging
+- Model versioning and reproducibility
+
+---
+
+*This model represents optimized performance based on hyperparameter tuning and comprehensive evaluation.*
+"""
+
+    return model_card
 ```
