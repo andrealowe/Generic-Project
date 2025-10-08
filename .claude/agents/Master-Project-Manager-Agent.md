@@ -235,7 +235,7 @@ def create_pipeline_wrapper(self, pipeline_output):
     return PipelineModel(pipeline_output['components'])
 
 def create_execution_plan(self, requirements):
-    """Create comprehensive execution plan with epoch-based stages"""
+    """Create comprehensive execution plan using best-practice ML project structure"""
     import json
     from datetime import datetime
 
@@ -274,16 +274,24 @@ def create_execution_plan(self, requirements):
 
     plan = ExecutionPlan()
 
-    # Epoch 1: Research and Business Analysis
+    # Base directories following best practices
+    base_path = '/mnt/code'
+    src_dir = f'{base_path}/src'
+    notebooks_dir = f'{base_path}/notebooks'
+    data_dir = f'{base_path}/data'
+    docs_dir = f'{base_path}/docs'
+    tests_dir = f'{base_path}/tests'
+    config_dir = f'{base_path}/config'
+
+    # Stage 1: Research and Business Analysis
     plan.add_stage(ExecutionStage(
-        name="epoch001_research_analysis",
+        name="stage01_research_analysis",
         agent_type="Business-Analyst-Agent",
         task={
             'stage': 'research_and_requirements',
             'requirements': requirements,
-            'research_directory': '/mnt/code/epoch001-research-analysis-planning/',
-            'output_directory': '/mnt/code/e001-business-analysis/',
-            'artifacts_directory': '/mnt/artifacts/e001-business-analysis/',
+            'docs_directory': f'{docs_dir}/research/',
+            'config_directory': config_dir,
             'conduct_research': True,
             'generate_pdf_report': True,
             'regulatory_assessment': True
@@ -291,120 +299,124 @@ def create_execution_plan(self, requirements):
         timeout=1800
     ))
 
-    # Confirmation checkpoint after Epoch 1
+    # Confirmation checkpoint after Stage 1
     plan.add_stage(ExecutionStage(
-        name="checkpoint001_review",
+        name="checkpoint01_review",
         agent_type="checkpoint",
         task={
             'stage': 'confirmation_checkpoint',
             'message': 'Research and business analysis complete. Please review the research report and requirements. Continue to data wrangling?',
             'artifacts_to_review': [
-                '/mnt/artifacts/e001-business-analysis/research_report.pdf',
-                '/mnt/code/e001-business-analysis/requirements/requirements_document.md'
+                f'{docs_dir}/research/research_report.pdf',
+                f'{docs_dir}/requirements.md'
             ]
         },
-        dependencies=["epoch001_research_analysis"]
+        dependencies=["stage01_research_analysis"]
     ))
 
-    # Epoch 2: Data Wrangling
+    # Stage 2: Data Wrangling
     plan.add_stage(ExecutionStage(
-        name="epoch002_data_wrangling",
+        name="stage02_data_wrangling",
         agent_type="Data-Wrangler-Agent",
         task={
             'stage': 'data_acquisition_and_preparation',
             'requirements': requirements,
-            'output_directory': '/mnt/code/e002-data-wrangling/',
-            'artifacts_directory': '/mnt/artifacts/e002-data-wrangling/',
-            'data_directory': '/mnt/data/{}/e002-data-wrangling/'.format(requirements.get('project', 'default')),
+            'src_directory': f'{src_dir}/data/',
+            'notebooks_directory': f'{notebooks_dir}/01_data_exploration/',
+            'data_directory': data_dir,
             'use_research_context': True
         },
-        dependencies=["checkpoint001_review"]
+        dependencies=["checkpoint01_review"]
     ))
 
-    # Checkpoint after Epoch 2
+    # Checkpoint after Stage 2
     plan.add_stage(ExecutionStage(
-        name="checkpoint002_review",
+        name="checkpoint02_review",
         agent_type="checkpoint",
         task={
             'stage': 'confirmation_checkpoint',
             'message': 'Data wrangling complete. Please review the data quality report and prepared datasets. Continue to data exploration?',
             'artifacts_to_review': [
-                '/mnt/artifacts/e002-data-wrangling/',
-                '/mnt/code/e002-data-wrangling/'
+                f'{data_dir}/processed/',
+                f'{docs_dir}/data_quality_report.md'
             ]
         },
-        dependencies=["epoch002_data_wrangling"]
+        dependencies=["stage02_data_wrangling"]
     ))
 
-    # Epoch 3: Data Science and Exploration
+    # Stage 3: Data Science and Exploration
     plan.add_stage(ExecutionStage(
-        name="epoch003_data_science",
+        name="stage03_data_science",
         agent_type="Data-Scientist-Agent",
         task={
             'stage': 'exploratory_data_analysis',
             'requirements': requirements,
-            'data_directory': '/mnt/data/{}/e002-data-wrangling/'.format(requirements.get('project', 'default')),
-            'output_directory': '/mnt/code/e003-data-science/',
-            'artifacts_directory': '/mnt/artifacts/e003-data-science/'
+            'data_directory': f'{data_dir}/processed/',
+            'notebooks_directory': f'{notebooks_dir}/01_data_exploration/',
+            'src_directory': f'{src_dir}/features/',
+            'docs_directory': docs_dir
         },
-        dependencies=["checkpoint002_review"]
+        dependencies=["checkpoint02_review"]
     ))
 
-    # Checkpoint after Epoch 3
+    # Checkpoint after Stage 3
     plan.add_stage(ExecutionStage(
-        name="checkpoint003_review",
+        name="checkpoint03_review",
         agent_type="checkpoint",
         task={
             'stage': 'confirmation_checkpoint',
             'message': 'Data exploration complete. Please review the EDA insights and feature analysis. Continue to model development?',
             'artifacts_to_review': [
-                '/mnt/artifacts/e003-data-science/',
-                '/mnt/code/e003-data-science/'
+                f'{notebooks_dir}/01_data_exploration/',
+                f'{docs_dir}/eda_insights.md'
             ]
         },
-        dependencies=["epoch003_data_science"]
+        dependencies=["stage03_data_science"]
     ))
 
-    # Epoch 4: Model Development
+    # Stage 4: Model Development
     plan.add_stage(ExecutionStage(
-        name="epoch004_model_development",
+        name="stage04_model_development",
         agent_type="Model-Developer-Agent",
         task={
             'stage': 'model_training_and_optimization',
             'requirements': requirements,
-            'data_directory': '/mnt/data/{}/e002-data-wrangling/'.format(requirements.get('project', 'default')),
-            'output_directory': '/mnt/code/e004-model-development/',
-            'artifacts_directory': '/mnt/artifacts/e004-model-development/',
+            'data_directory': f'{data_dir}/processed/',
+            'notebooks_directory': f'{notebooks_dir}/02_model_development/',
+            'src_directory': f'{src_dir}/models/',
+            'config_directory': config_dir,
             'use_research_recommendations': True
         },
-        dependencies=["checkpoint003_review"]
+        dependencies=["checkpoint03_review"]
     ))
 
-    # Checkpoint after Epoch 4
+    # Checkpoint after Stage 4
     plan.add_stage(ExecutionStage(
-        name="checkpoint004_review",
+        name="checkpoint04_review",
         agent_type="checkpoint",
         task={
             'stage': 'confirmation_checkpoint',
             'message': 'Model development complete. Please review the trained models and performance metrics. Continue to model testing?',
             'artifacts_to_review': [
-                '/mnt/artifacts/e004-model-development/',
-                '/mnt/code/e004-model-development/'
+                f'{notebooks_dir}/02_model_development/',
+                f'{src_dir}/models/',
+                'MLflow Experiments'
             ]
         },
-        dependencies=["epoch004_model_development"]
+        dependencies=["stage04_model_development"]
     ))
 
-    # Epoch 5: Model Testing
+    # Stage 5: Model Testing
     plan.add_stage(ExecutionStage(
-        name="epoch005_model_testing",
+        name="stage05_model_testing",
         agent_type="Model-Tester-Agent",
         task={
             'stage': 'comprehensive_model_testing',
             'requirements': requirements,
-            'model_path': '/mnt/artifacts/e004-model-development/best_model/',
-            'output_directory': '/mnt/code/e005-model-testing/',
-            'artifacts_directory': '/mnt/artifacts/e005-model-testing/',
+            'src_directory': f'{src_dir}/models/',
+            'tests_directory': f'{tests_dir}/model/',
+            'notebooks_directory': f'{notebooks_dir}/03_model_evaluation/',
+            'docs_directory': docs_dir,
             'test_requirements': {
                 'functional_requirements': requirements.get('functional_requirements', {}),
                 'performance_requirements': requirements.get('performance_requirements', {}),
@@ -412,85 +424,88 @@ def create_execution_plan(self, requirements):
                 'fairness_requirements': requirements.get('fairness_requirements', {})
             }
         },
-        dependencies=["checkpoint004_review"]
+        dependencies=["checkpoint04_review"]
     ))
 
-    # Checkpoint after Epoch 5
+    # Checkpoint after Stage 5
     plan.add_stage(ExecutionStage(
-        name="checkpoint005_review",
+        name="checkpoint05_review",
         agent_type="checkpoint",
         task={
             'stage': 'confirmation_checkpoint',
-            'message': 'Model testing complete. Please review the test results and validation reports. Continue to MLOps deployment?',
+            'message': 'Model testing complete. Please review the test results and validation reports. Continue to deployment?',
             'artifacts_to_review': [
-                '/mnt/artifacts/e005-model-testing/test_report.md',
-                '/mnt/artifacts/e005-model-testing/'
+                f'{docs_dir}/test_report.md',
+                f'{tests_dir}/model/'
             ]
         },
-        dependencies=["epoch005_model_testing"]
+        dependencies=["stage05_model_testing"]
     ))
 
-    # Epoch 6: MLOps Engineering
+    # Stage 6: Deployment & Monitoring
     plan.add_stage(ExecutionStage(
-        name="epoch006_mlops",
+        name="stage06_deployment_monitoring",
         agent_type="MLOps-Engineer-Agent",
         task={
             'stage': 'deployment_and_monitoring',
             'requirements': requirements,
-            'model_path': '/mnt/artifacts/e004-model-development/best_model/',
-            'test_results': '/mnt/artifacts/e005-model-testing/',
-            'output_directory': '/mnt/code/e006-mlops/',
-            'artifacts_directory': '/mnt/artifacts/e006-mlops/',
+            'src_directory': src_dir,
+            'api_directory': f'{src_dir}/api/',
+            'monitoring_directory': f'{src_dir}/monitoring/',
+            'config_directory': config_dir,
+            'notebooks_directory': f'{notebooks_dir}/04_deployment_prep/',
+            'test_results': f'{docs_dir}/test_report.md',
             'deployment_architecture': requirements.get('deployment_architecture', 'production')
         },
-        dependencies=["checkpoint005_review"]
+        dependencies=["checkpoint05_review"]
     ))
 
-    # Checkpoint after Epoch 6
+    # Checkpoint after Stage 6
     plan.add_stage(ExecutionStage(
-        name="checkpoint006_review",
+        name="checkpoint06_review",
         agent_type="checkpoint",
         task={
             'stage': 'confirmation_checkpoint',
-            'message': 'MLOps deployment complete. Please review the deployment configuration and monitoring setup. Continue to frontend development?',
+            'message': 'Deployment and monitoring setup complete. Please review the API endpoints and monitoring configuration. Continue to application development?',
             'artifacts_to_review': [
-                '/mnt/artifacts/e006-mlops/',
-                '/mnt/code/e006-mlops/'
+                f'{src_dir}/api/',
+                f'{src_dir}/monitoring/',
+                f'{config_dir}/monitoring_config.json'
             ]
         },
-        dependencies=["epoch006_mlops"]
+        dependencies=["stage06_deployment_monitoring"]
     ))
 
-    # Epoch 7: Frontend Development
+    # Stage 7: Application Development
     plan.add_stage(ExecutionStage(
-        name="epoch007_frontend",
+        name="stage07_application",
         agent_type="Front-End-Developer-Agent",
         task={
             'stage': 'application_development',
             'requirements': requirements,
-            'model_api': '/mnt/artifacts/e006-mlops/api_config.json',
-            'output_directory': '/mnt/code/e007-frontend/',
-            'artifacts_directory': '/mnt/artifacts/e007-frontend/',
+            'src_directory': src_dir,
+            'api_config': f'{config_dir}/api_config.json',
+            'docs_directory': docs_dir,
             'use_research_recommendations': True
         },
-        dependencies=["checkpoint006_review"]
+        dependencies=["checkpoint06_review"]
     ))
 
     # Final checkpoint
     plan.add_stage(ExecutionStage(
-        name="checkpoint007_final",
+        name="checkpoint07_final",
         agent_type="checkpoint",
         task={
             'stage': 'final_review',
             'message': 'Complete ML pipeline finished. Please review all deliverables and confirm project completion.',
             'artifacts_to_review': [
-                '/mnt/artifacts/e001-business-analysis/research_report.pdf',
-                '/mnt/artifacts/e005-model-testing/test_report.md',
-                '/mnt/artifacts/e007-frontend/',
-                '/mnt/code/e007-frontend/'
+                f'{docs_dir}/research/research_report.pdf',
+                f'{docs_dir}/test_report.md',
+                f'{src_dir}/api/predict.py',
+                'Deployed Application'
             ]
         },
-        dependencies=["epoch007_frontend"]
+        dependencies=["stage07_application"]
     ))
 
     return plan

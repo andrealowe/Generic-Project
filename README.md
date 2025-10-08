@@ -149,24 +149,58 @@ This command will:
 
 ## Project Structure
 
+This template follows ML engineering best practices with clear separation between research and production code:
+
 ```
-Your Project/
-├── epoch001-research-analysis-planning/    # Research & regulatory assessment
-├── epoch002-data-wrangling/               # Data pipelines & quality
-├── epoch003-data-exploration/             # EDA & insights
-├── epoch004-model-development/            # ML training & optimization
-├── epoch005-model-testing/                # Comprehensive testing suite
-├── epoch006-application-development/      # Applications & dashboards
-├── epoch007-retrospective/               # Project review & lessons learned
-└── artifacts/                           # Research reports, test results, models
-    ├── e001-business-analysis/           # Research PDFs, compliance docs
-    ├── e002-data-wrangling/             # Data quality reports
-    ├── e003-data-science/               # EDA insights, visualizations
-    ├── e004-model-development/          # Model artifacts, experiments
-    ├── e005-model-testing/              # Test reports, compliance validation
-    ├── e006-application-development/    # UI artifacts, deployment configs
-    └── e007-retrospective/              # Project summary, lessons learned
+generic-project/
+├── src/                    # Production-ready source code
+│   ├── data/              # Data processing and ETL pipelines
+│   ├── models/            # Model training and inference code
+│   ├── features/          # Feature engineering modules
+│   ├── api/               # API endpoints (predict.py)
+│   ├── monitoring/        # Model monitoring scripts
+│   └── utils/             # Shared utilities
+├── notebooks/             # Exploratory analysis and research
+│   ├── 01_data_exploration/
+│   ├── 02_model_development/
+│   ├── 03_model_evaluation/
+│   └── 04_deployment_prep/
+├── tests/                 # Automated tests
+│   ├── unit/             # Unit tests for functions
+│   ├── integration/      # Integration tests
+│   └── model/            # Model validation tests
+├── data/                  # Data storage (excluded from git)
+│   ├── raw/              # Original, immutable data
+│   ├── processed/        # Cleaned and transformed data
+│   └── features/         # Generated feature sets
+├── config/               # Configuration files
+│   ├── model_config.yaml
+│   ├── data_config.yaml
+│   └── monitoring_config.json
+├── docs/                 # Project documentation
+│   ├── 01-research-planning.md
+│   ├── 02-data-wrangling.md
+│   ├── 03-data-exploration.md
+│   ├── 04-model-development.md
+│   ├── 05-model-testing.md
+│   ├── 06-application-development.md
+│   └── 07-retrospective.md
+├── .claude/              # Agent configurations
+│   └── agents/           # Specialized agent definitions
+└── README.md            # This file
 ```
+
+### Design Philosophy
+
+**Research vs. Production Separation**
+- Keep exploratory work in `notebooks/` for iteration and discovery
+- Move production-ready code to `src/` for deployment and maintenance
+- This accelerates delivery by clearly defining research vs. production phases
+
+**Modularity & Testability**
+- Each component in `src/` is independently testable
+- Configuration separated from code for environment flexibility
+- Clear interfaces between data, features, models, and deployment
 
 ## Enhanced Testing Capabilities
 
