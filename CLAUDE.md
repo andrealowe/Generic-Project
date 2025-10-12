@@ -11,25 +11,35 @@ This repository contains a collection of specialized Claude Code agents designed
 The repository follows a standardized structure:
 
 ```
-/mnt/
-├── code/{stage}/           # Scripts, notebooks, requirements.txt
-│   ├── notebooks/          # Jupyter notebooks for exploration
-│   ├── scripts/           # Production Python scripts
-│   └── requirements.txt   # Stage-specific dependencies
-├── artifacts/{stage}/      # Models, reports, visualizations
-│   ├── models/            # Saved model files
-│   └── visualizations/    # Generated plots and reports
-└── data/{project}/{stage}/ # Project-specific datasets
+/mnt/code/
+├── src/                    # Production Python code
+│   ├── api/               # API endpoints and serving
+│   ├── models/            # Model training and preprocessing
+│   ├── monitoring/        # Model monitoring and dashboards
+│   └── data/              # Data generation and processing
+├── scripts/                # Utility scripts and applications
+├── notebooks/              # Jupyter notebooks for exploration
+├── config/                 # Configuration files
+├── tests/                  # Unit and integration tests
+├── docs/                   # Documentation
+│   └── business-analysis/ # Business requirements and analysis
+└── data/                   # Data files (not committed to git)
+    └── {project}/         # Project-specific datasets
+
+/mnt/artifacts/
+├── models/                 # Saved model files
+├── reports/                # Analysis reports
+└── visualizations/         # Generated plots and charts
 ```
 
-Where `{stage}` represents one of the following directories:
-- `e001-business-analysis` - Business requirements and analysis
-- `e002-data-wrangling` - Data acquisition and preparation
-- `e003-data-science` - Exploratory data analysis and insights
-- `e004-model-development` - Model training and optimization
-- `e005-model-validation` - Model testing and validation
-- `e006-mlops` - ML operations and deployment
-- `e007-frontend` - User interface and visualization
+**Key directories:**
+- `src/` - All production Python code organized by function
+- `scripts/` - Standalone scripts and frontend applications
+- `notebooks/` - Exploratory Jupyter notebooks
+- `config/` - Configuration and deployment specs
+- `tests/` - All test files
+- `docs/` - Documentation including business analysis
+- `data/{project}/` - Project-specific datasets
 
 ## Available Agents
 
@@ -62,21 +72,81 @@ Where `{stage}` represents one of the following directories:
   - Line of Business (lob-leadership, lob-review)
   - Marketing teams (marketing-review, marketing-leadership)
 
+## Domino Data Lab Platform
+
+This project is designed for deployment on **Domino Data Lab**, an enterprise MLOps platform.
+
+### Domino Resources
+- **Official Documentation**: https://docs.dominodatalab.com
+- **Platform Access**: Workspaces, Datasets, Jobs, Apps, Model APIs, Flows
+
+### Key Domino Features Used
+- **Domino Workspaces** - Interactive development environments
+- **Domino Datasets** - Centralized data storage and versioning
+- **Domino Apps** - Deploy Streamlit/Dash applications with `app.sh` launcher
+- **Domino Model APIs** - Scalable model serving with monitoring
+- **Domino Flows** - Orchestrate multi-step ML pipelines
+- **Domino Jobs** - Scheduled and on-demand execution
+- **MLflow Integration** - Built-in experiment tracking at http://localhost:8768
+- **Git Integration** - Automatic version control
+
+### Agent Instructions for Domino Deployment
+
+When working with Domino-specific features, agents should:
+
+1. **Reference Latest Documentation**
+   - Use WebFetch to retrieve current docs from https://docs.dominodatalab.com
+   - Follow Domino best practices for deployment patterns
+   - Check for version-specific features and compatibility
+
+2. **File System Structure**
+   - Use `/mnt/code/` for all code (Git-synced)
+   - Use `/mnt/data/` for datasets (not in Git)
+   - Use `/mnt/artifacts/` for models and outputs (persisted)
+   - All paths must be absolute, not relative
+
+3. **App Deployment**
+   - Create `app.sh` as the launcher script for Domino Apps
+   - Configure proper ports (8050 for Dash, 8501 for Streamlit)
+   - Include health checks and startup validation
+   - Document hardware requirements (compute tier, GPU needs)
+
+4. **API Deployment**
+   - Use FastAPI or Flask for Model APIs
+   - Implement `/health` endpoint for monitoring
+   - Log predictions for drift detection
+   - Configure authentication if required
+
+5. **Environment Configuration**
+   - Document required environment variables
+   - Specify Python version and dependencies in requirements.txt
+   - Note any system packages needed
+   - Include Dockerfile if custom environment needed
+
+6. **Best Practices**
+   - Use Domino Datasets for large data files (>100MB)
+   - Leverage Domino's built-in MLflow (no separate setup needed)
+   - Use Domino Jobs for scheduled training/retraining
+   - Deploy monitoring dashboards as Domino Apps
+   - Use Domino Flows for production pipelines
+
 ## Technology Stack
 
+- **Platform**: Domino Data Lab (MLOps orchestration)
 - **Primary Language**: Python for all ML operations
 - **ML Frameworks**: scikit-learn, XGBoost, LightGBM, TensorFlow, PyTorch
 - **UI Frameworks**: Streamlit (quick demos), Dash, Gradio, Panel, React/FastAPI
-- **Experiment Tracking**: MLflow with parent-child run hierarchy
-- **Deployment**: FastAPI, Flask, Docker, Domino Flows
+- **Experiment Tracking**: MLflow (built-in at http://localhost:8768)
+- **Deployment**: FastAPI, Flask, Docker, Domino Flows, Domino Apps, Domino Model APIs
 
 ## Key Patterns
 
 ### Agent Coordination
 - Use Master-Project-Manager-Agent for complete end-to-end workflows with governance orchestration
 - Individual agents can work independently for specific tasks
-- All agents automatically create standardized directory structures
-- Each stage produces requirements.txt for dependency management
+- All agents use the standardized directory structure
+- Production code goes in `src/`, scripts in `scripts/`, notebooks in `notebooks/`
+- Dependencies managed in project-level `requirements.txt`
 - Governance compliance is automatically assessed and integrated into workflows
 
 ### Governance Workflow Patterns
@@ -93,19 +163,54 @@ Where `{stage}` represents one of the following directories:
 - Comprehensive artifact tracking at each stage
 
 ### File Organization
-- Each agent creates its own stage directory under `/mnt/code/{stage}/` (e.g., `/mnt/code/e001-business-analysis/`)
-- Notebooks go in `{stage}/notebooks/`, scripts in `{stage}/scripts/`
-- Artifacts saved to `/mnt/artifacts/{stage}/`
-- Data organized by project: `/mnt/data/{project}/{stage}/`
+- **Production code** → `/mnt/code/src/` (organized by function: api, models, monitoring, data)
+- **Scripts** → `/mnt/code/scripts/` (utility scripts, frontend apps)
+- **Notebooks** → `/mnt/code/notebooks/` (exploratory analysis)
+- **Tests** → `/mnt/code/tests/` (all test files)
+- **Configuration** → `/mnt/code/config/` (deployment configs, settings)
+- **Documentation** → `/mnt/code/docs/` (including business analysis)
+- **Artifacts** → `/mnt/artifacts/` (models, reports, visualizations)
+- **Data** → `/mnt/data/{project}/` (project-specific datasets)
+
+## Project Development Workflow
+
+### Starting a New Project
+
+When you request ML project development, the **Master-Project-Manager-Agent** will ask you to select which Domino deployment features you want:
+
+**Available Domino Features:**
+1. **Domino Flows** - Automated ML pipeline orchestration
+2. **Domino Launchers** - Self-service parameter-driven execution
+3. **Domino Model APIs (Endpoints)** - REST API for real-time predictions
+4. **Domino Apps** - Interactive web applications (Streamlit/Dash/Gradio)
+
+You can choose:
+- **All** - Full deployment stack (Flows + Launchers + Endpoints + Apps)
+- **Specific features** - e.g., "Just endpoints and apps"
+- **None** - Model training and testing only
+
+The agent will invoke only the relevant sub-agents based on your selection.
 
 ## Common Usage Patterns
 
 ```python
-# Quick demonstration with governance
-"Create a credit risk model demo with synthetic data following ethical AI guidelines"
+# Full project with all Domino features
+"Build a customer churn prediction model"
+→ Agent asks: Which Domino features?
+→ You respond: "All features"
+→ Creates: Flows, Launchers, Endpoint, and Dashboard
 
-# Full pipeline with compliance
-"Build an end-to-end customer churn prediction system with dashboard meeting NIST RMF requirements"
+# Specific deployment features
+"Create a credit risk model with API endpoint and dashboard"
+→ Agent asks: Which Domino features?
+→ You respond: "Endpoints and Apps"
+→ Creates: Model API endpoint + Streamlit dashboard (skips Flows and Launchers)
+
+# Training only
+"Train a fraud detection model and test it"
+→ Agent asks: Which Domino features?
+→ You respond: "None, just training and testing"
+→ Creates: Model training + validation (skips all deployment)
 
 # Governance-specific tasks
 "Validate this model for compliance with model risk management framework"

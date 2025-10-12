@@ -849,9 +849,9 @@ def generate_test_report(self, test_results, context):
     from datetime import datetime
 
     # Create report directory
-    os.makedirs('/mnt/artifacts/e005-model-testing', exist_ok=True)
+    os.makedirs('/mnt/artifacts/reports', exist_ok=True)
 
-    report_path = '/mnt/artifacts/e005-model-testing/test_report.md'
+    report_path = '/mnt/artifacts/reports/test_report.md'
 
     with open(report_path, 'w') as f:
         f.write("# Model Testing Report\n\n")

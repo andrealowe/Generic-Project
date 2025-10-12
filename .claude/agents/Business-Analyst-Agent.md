@@ -256,8 +256,9 @@ def conduct_research_phase(self, initial_request, context):
         self.generate_research_report_pdf(research_findings)
 
         # Save findings to artifacts
-        os.makedirs('/mnt/artifacts/e001-business-analysis', exist_ok=True)
-        with open('/mnt/artifacts/e001-business-analysis/research_findings.json', 'w') as f:
+        os.makedirs('/mnt/artifacts/reports', exist_ok=True)
+        os.makedirs('/mnt/code/docs/business-analysis', exist_ok=True)
+        with open('/mnt/artifacts/reports/research_findings.json', 'w') as f:
             json.dump(research_findings, f, indent=2)
 
         # Log key findings to MLflow
@@ -706,10 +707,12 @@ def generate_research_report_pdf(self, research_findings):
     from datetime import datetime
 
     # Create artifacts directory
-    os.makedirs('/mnt/artifacts/e001-business-analysis', exist_ok=True)
+    os.makedirs('/mnt/artifacts/reports', exist_ok=True)
+    os.makedirs('/mnt/code/docs/business-analysis', exist_ok=True)
 
     # Create PDF
-    pdf_path = '/mnt/artifacts/e001-business-analysis/research_report.pdf'
+    os.makedirs('/mnt/artifacts/reports', exist_ok=True)
+    pdf_path = '/mnt/artifacts/reports/business_analysis_report.pdf'
     doc = SimpleDocTemplate(pdf_path, pagesize=letter)
     story = []
     styles = getSampleStyleSheet()
