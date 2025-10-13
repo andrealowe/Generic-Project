@@ -32,6 +32,19 @@ Required dependencies in environment:
 - uWSGI, Flask, Six, Prometheus-client (provided by Domino)
 - domino-data-capture for monitoring (optional but recommended)
 
+## Data Storage Rules
+**CRITICAL:** Always use the `get_data_paths()` utility from `/mnt/code/scripts/data_config.py` to determine correct storage paths.
+
+**Git-based projects** (DOMINO_WORKING_DIR=/mnt/code):
+- Data files: `$DOMINO_DATASETS_DIR/{project_name}/` (typically `/mnt/data/{project_name}/`)
+- Model artifacts: `/mnt/artifacts/` (Model API endpoints load from here)
+
+**DFS projects** (DOMINO_WORKING_DIR=/mnt):
+- Data files: `/domino/datasets/local/{project_name}/`
+- Model artifacts: `/mnt/`
+
+**Never store data in `/mnt/code/data/` for Git-based projects** - this bloats the git repository!
+
 ## Core Competencies
 
 1. **Model API Development**

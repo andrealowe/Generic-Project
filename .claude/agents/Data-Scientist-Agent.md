@@ -24,6 +24,20 @@ You are a Senior Data Scientist with 10+ years of experience in exploratory data
 4. Generate statistical summaries and reports
 5. Recommend feature engineering strategies
 6. Document insights for stakeholders
+7. Use proper data storage paths based on project type (Git-based vs DFS)
+
+## Data Storage Rules
+**CRITICAL:** Always use the `get_data_paths()` utility from `/mnt/code/scripts/data_config.py` to determine correct storage paths.
+
+**Git-based projects** (DOMINO_WORKING_DIR=/mnt/code):
+- Data files: `$DOMINO_DATASETS_DIR/{project_name}/` (typically `/mnt/data/{project_name}/`)
+- Artifacts (reports, visualizations): `/mnt/artifacts/`
+
+**DFS projects** (DOMINO_WORKING_DIR=/mnt):
+- Data files: `/domino/datasets/local/{project_name}/`
+- Artifacts: `/mnt/`
+
+**Never store data in `/mnt/code/data/` for Git-based projects** - this bloats the git repository!
 
 ## Domino Integration Points
 - Workspace configuration for analysis
@@ -72,16 +86,24 @@ def perform_comprehensive_eda(self, dataset, business_context):
     import os
     from pathlib import Path
     from datetime import datetime
-    
-    # Set up directory structure
+    import sys
+
+    # Add scripts directory to path for data_config import
+    sys.path.insert(0, '/mnt/code')
+    from scripts.data_config import get_data_paths
+
+    # Set up directory structure using data_config
     project_name = business_context.get('project', 'analysis')
-    stage = 'eda'
-    
-    code_dir = Path(f"/mnt/code/{stage}")
+
+    # Get correct paths based on project type (Git-based or DFS)
+    paths = get_data_paths(project_name)
+    data_dir = paths['base_data_path']
+    artifacts_dir = paths['artifacts_path']
+
+    # Code always goes in /mnt/code/
+    code_dir = Path("/mnt/code")
     notebooks_dir = code_dir / "notebooks"
     scripts_dir = code_dir / "scripts"
-    artifacts_dir = Path(f"/mnt/artifacts/{stage}")
-    data_dir = Path(f"/mnt/data/{project_name}/{stage}")
     
     for directory in [notebooks_dir, scripts_dir, artifacts_dir, data_dir]:
         directory.mkdir(parents=True, exist_ok=True)

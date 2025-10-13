@@ -25,6 +25,20 @@ You are a Senior Data Engineer with 12+ years of experience in enterprise data a
 4. Implement data quality checks with Python (great_expectations, pandera)
 5. Version datasets for reproducibility
 6. Create data documentation and dictionaries
+7. Use proper data storage paths based on project type (Git-based vs DFS)
+
+## Data Storage Rules
+**CRITICAL:** Always use the `get_data_paths()` utility from `/mnt/code/scripts/data_config.py` to determine correct storage paths.
+
+**Git-based projects** (DOMINO_WORKING_DIR=/mnt/code):
+- Data files: `$DOMINO_DATASETS_DIR/{project_name}/` (typically `/mnt/data/{project_name}/`)
+- Artifacts (models, reports): `/mnt/artifacts/`
+
+**DFS projects** (DOMINO_WORKING_DIR=/mnt):
+- Data files: `/domino/datasets/local/{project_name}/`
+- Artifacts: `/mnt/`
+
+**Never store data in `/mnt/code/data/` for Git-based projects** - this bloats the git repository!
 
 ## Domino Integration Points
 - Data source connections configuration
@@ -71,17 +85,24 @@ def acquire_or_generate_data(self, specifications):
     import os
     from datetime import datetime
     from pathlib import Path
-    
-    # Set up directory structure
+    import sys
+
+    # Add scripts directory to path for data_config import
+    sys.path.insert(0, '/mnt/code')
+    from scripts.data_config import get_data_paths
+
+    # Set up directory structure using data_config
     project_name = specifications.get('project', 'demo')
-    stage = 'data_acquisition'
-    
-    # Create directories if they don't exist
-    code_dir = Path(f"/mnt/code/{stage}")
+
+    # Get correct paths based on project type (Git-based or DFS)
+    paths = get_data_paths(project_name)
+    data_dir = paths['base_data_path']
+    artifacts_dir = paths['artifacts_path']
+
+    # Code always goes in /mnt/code/
+    code_dir = Path("/mnt/code")
     notebooks_dir = code_dir / "notebooks"
-    scripts_dir = code_dir / "scripts"
-    artifacts_dir = Path(f"/mnt/artifacts/{stage}")
-    data_dir = Path(f"/mnt/data/{project_name}/{stage}")
+    scripts_dir = code_dir / "scripts" if not (code_dir / "scripts").exists() else code_dir / "src" / "data"
     
     for directory in [notebooks_dir, scripts_dir, artifacts_dir, data_dir]:
         directory.mkdir(parents=True, exist_ok=True)
@@ -263,18 +284,27 @@ sns.set_palette("husl")
 """)
     nb.cells.append(imports_cell)
 
-    # Add data loading section
+    # Add data loading section with proper path resolution
     project_name = specifications.get('project', 'demo')
     data_load_cell = nbf.v4.new_code_cell(f"""
-# Load the acquired dataset
-data_path = "/mnt/data/{project_name}/data_acquisition/raw_data.parquet"
-if Path(data_path).exists():
+# Load the acquired dataset using data_config for correct paths
+import sys
+sys.path.insert(0, '/mnt/code')
+from scripts.data_config import get_data_paths
+from pathlib import Path
+
+# Get correct data path based on project type
+paths = get_data_paths('{project_name}')
+data_path = paths['base_data_path'] / "raw_data.parquet"
+
+if data_path.exists():
     df = pd.read_parquet(data_path)
     print(f"Dataset loaded successfully!")
     print(f"Shape: {{df.shape}}")
     print(f"Memory usage: {{df.memory_usage(deep=True).sum() / 1024**2:.2f}} MB")
 else:
-    print("Dataset not found at expected location")
+    print(f"Dataset not found at: {{data_path}}")
+    print(f"Project type: {{'Git-based' if paths['is_git_based'] else 'DFS-based'}}")
 
 # Display first few rows
 df.head()

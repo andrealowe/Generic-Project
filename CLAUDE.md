@@ -16,30 +16,38 @@ The repository follows a standardized structure:
 │   ├── api/               # API endpoints and serving
 │   ├── models/            # Model training and preprocessing
 │   ├── monitoring/        # Model monitoring and dashboards
-│   └── data/              # Data generation and processing
+│   └── data/              # Data generation and processing scripts
 ├── scripts/                # Utility scripts and applications
+│   └── data_config.py     # Data path configuration utility
 ├── notebooks/              # Jupyter notebooks for exploration
 ├── config/                 # Configuration files
 ├── tests/                  # Unit and integration tests
-├── docs/                   # Documentation
-│   └── business-analysis/ # Business requirements and analysis
-└── data/                   # Data files (not committed to git)
-    └── {project}/         # Project-specific datasets
+└── docs/                   # Documentation
+    └── business-analysis/ # Business requirements and analysis
 
-/mnt/artifacts/
+/mnt/artifacts/             # Git-based projects only
 ├── models/                 # Saved model files
 ├── reports/                # Analysis reports
 └── visualizations/         # Generated plots and charts
+
+/mnt/data/{project}/        # Git-based projects: Dataset storage
+└── ...                     # (Use get_data_paths() to determine)
+
+/domino/datasets/local/{project}/  # DFS projects: Dataset storage
+└── ...                            # (Use get_data_paths() to determine)
 ```
 
 **Key directories:**
 - `src/` - All production Python code organized by function
-- `scripts/` - Standalone scripts and frontend applications
+- `scripts/` - Standalone scripts and frontend applications (includes data_config.py)
 - `notebooks/` - Exploratory Jupyter notebooks
 - `config/` - Configuration and deployment specs
 - `tests/` - All test files
 - `docs/` - Documentation including business analysis
-- `data/{project}/` - Project-specific datasets
+
+**Data storage locations (use `get_data_paths()` to determine):**
+- Git-based: `/mnt/data/{project}/` for datasets, `/mnt/artifacts/` for models
+- DFS-based: `/domino/datasets/local/{project}/` for datasets, `/mnt/` for models
 
 ## Available Agents
 
@@ -99,11 +107,48 @@ When working with Domino-specific features, agents should:
    - Follow Domino best practices for deployment patterns
    - Check for version-specific features and compatibility
 
-2. **File System Structure**
-   - Use `/mnt/code/` for all code (Git-synced)
-   - Use `/mnt/data/` for datasets (not in Git)
-   - Use `/mnt/artifacts/` for models and outputs (persisted)
-   - All paths must be absolute, not relative
+2. **File System Structure and Data Storage**
+
+   **CRITICAL: Use the Data Config Utility**
+
+   All agents MUST use `/mnt/code/scripts/data_config.py` to determine correct storage paths. This ensures compatibility across Git-based and DFS (Domino File System) projects.
+
+   **Data Storage Rules by Project Type:**
+
+   **Git-based Projects** (DOMINO_WORKING_DIR=/mnt/code):
+   - Code: `/mnt/code/` (Git-synced)
+   - Data files: `$DOMINO_DATASETS_DIR/{project_name}/` (typically `/mnt/data/{project_name}/`)
+   - Artifacts: `/mnt/artifacts/` (models, reports, visualizations)
+   - **Never store data in `/mnt/code/data/`** - this bloats the git repository!
+
+   **DFS Projects** (DOMINO_WORKING_DIR=/mnt):
+   - Code: `/mnt/code/`
+   - Data files: `/domino/datasets/local/{project_name}/`
+   - Artifacts: `/mnt/` (models, reports)
+
+   **Usage in Scripts:**
+   ```python
+   # Import the utility
+   import sys
+   sys.path.insert(0, '/mnt/code')
+   from scripts.data_config import get_data_paths
+
+   # Get correct paths
+   paths = get_data_paths('my_project')
+   data_dir = paths['base_data_path']      # Where to store datasets
+   artifacts_dir = paths['artifacts_path']  # Where to store models/reports
+
+   # Example: Save data
+   train_csv = data_dir / 'train.csv'
+   df.to_csv(train_csv, index=False)
+
+   # Example: Save model
+   model_path = artifacts_dir / 'models' / 'my_model.pkl'
+   model_path.parent.mkdir(parents=True, exist_ok=True)
+   joblib.dump(model, model_path)
+   ```
+
+   All paths must be absolute, not relative
 
 3. **App Deployment**
    - Create `app.sh` as the launcher script for Domino Apps
@@ -165,20 +210,25 @@ When working with Domino-specific features, agents should:
 ### File Organization
 - **Production code** → `/mnt/code/src/` (organized by function: api, models, monitoring, data)
 - **Scripts** → `/mnt/code/scripts/` (utility scripts, frontend apps)
+  - **data_config.py** → Utility for determining correct data storage paths
 - **Notebooks** → `/mnt/code/notebooks/` (exploratory analysis)
 - **Tests** → `/mnt/code/tests/` (all test files)
 - **Configuration** → `/mnt/code/config/` (deployment configs, settings)
 - **Documentation** → `/mnt/code/docs/` (including business analysis)
-- **Artifacts** → `/mnt/artifacts/` (models, reports, visualizations)
-- **Data** → `/mnt/data/{project}/` (project-specific datasets)
+- **Artifacts** → Use `get_data_paths()['artifacts_path']` (Git: `/mnt/artifacts/`, DFS: `/mnt/`)
+- **Data** → Use `get_data_paths()['base_data_path']` (Git: `/mnt/data/{project}/`, DFS: `/domino/datasets/local/{project}/`)
+
+**IMPORTANT**: Always use `/mnt/code/scripts/data_config.py::get_data_paths()` to determine artifact and data paths dynamically based on project type.
 
 ## Project Development Workflow
 
 ### Starting a New Project
 
-When you request ML project development, the **Master-Project-Manager-Agent** will ask you to select which Domino deployment features you want:
+When you request ML project development, the **Master-Project-Manager-Agent** will ask you two questions:
 
-**Available Domino Features:**
+**1. Domino Deployment Features:**
+
+Which features would you like to create?
 1. **Domino Flows** - Automated ML pipeline orchestration
 2. **Domino Launchers** - Self-service parameter-driven execution
 3. **Domino Model APIs (Endpoints)** - REST API for real-time predictions
@@ -189,27 +239,57 @@ You can choose:
 - **Specific features** - e.g., "Just endpoints and apps"
 - **None** - Model training and testing only
 
-The agent will invoke only the relevant sub-agents based on your selection.
+**2. Research Time Limit:**
+
+How much time should the agent spend researching before presenting the plan?
+- **Quick (2-3 minutes)** - Basic research, standard approach
+- **Standard (5-7 minutes)** - Moderate research, best practices review (default)
+- **Thorough (10-15 minutes)** - Deep research, comprehensive planning
+- **Custom** - Specify your own time limit (e.g., "4 minutes")
+
+The agent will:
+1. Conduct research within your time limit
+2. Present a project plan
+3. Ask how you want to execute: **Step-by-step approval** or **Full automation**
+4. Invoke only the relevant sub-agents based on your feature selection
+
+**Execution Modes:**
+- **Step-by-Step Approval**: Agent pauses before each major milestone (data generation, EDA, training, testing, deployment) and asks for approval
+  - Best for: Learning, demos, quality control, customization
+- **Full Automation**: Agent executes the entire plan without interruption
+  - Best for: Speed, trusted workflows, standard implementations
 
 ## Common Usage Patterns
 
 ```python
-# Full project with all Domino features
+# Full project with automation
 "Build a customer churn prediction model"
-→ Agent asks: Which Domino features?
-→ You respond: "All features"
+→ Agent asks: Which features? How much research time?
+→ You respond: "All features, standard research"
+→ Agent: Conducts 5-7 min research, presents plan
+→ Agent asks: Step-by-step or Automated?
+→ You respond: "Automated"
+→ Agent: Executes entire plan automatically
 → Creates: Flows, Launchers, Endpoint, and Dashboard
 
-# Specific deployment features
+# Quick deployment with step-by-step review
 "Create a credit risk model with API endpoint and dashboard"
-→ Agent asks: Which Domino features?
-→ You respond: "Endpoints and Apps"
-→ Creates: Model API endpoint + Streamlit dashboard (skips Flows and Launchers)
+→ Agent asks: Which features? How much research time?
+→ You respond: "Endpoints and Apps, quick - 3 minutes"
+→ Agent: Conducts 3 min research, presents plan
+→ Agent asks: Step-by-step or Automated?
+→ You respond: "Step-by-step - I want to review each stage"
+→ Agent: Pauses before data generation, EDA, training, endpoint, dashboard
+→ Creates: Model API endpoint + Streamlit dashboard with your approval at each step
 
-# Training only
-"Train a fraud detection model and test it"
-→ Agent asks: Which Domino features?
-→ You respond: "None, just training and testing"
+# Thorough compliance project with automation
+"Train a fraud detection model for a bank"
+→ Agent asks: Which features? How much research time?
+→ You respond: "None, just training. Thorough research for compliance"
+→ Agent: Conducts 10-15 min deep research on regulations, presents plan
+→ Agent asks: Step-by-step or Automated?
+→ You respond: "Automated - plan looks good"
+→ Agent: Executes training pipeline automatically
 → Creates: Model training + validation (skips all deployment)
 
 # Governance-specific tasks
