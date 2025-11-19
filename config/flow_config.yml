@@ -1,0 +1,366 @@
+# Domino Flow Configuration for Diesel Fuel Quality Prediction Pipeline
+# This file defines the automated ML pipeline for training and deployment
+
+name: diesel_fuel_quality_pipeline
+description: Automated pipeline for diesel fuel quality prediction model training and deployment
+
+# Flow parameters that can be configured when running the flow
+parameters:
+  - name: retrain_models
+    type: boolean
+    default: false
+    description: Whether to retrain models from scratch
+  
+  - name: data_samples
+    type: integer
+    default: 8000
+    description: Number of samples to generate for training
+  
+  - name: model_performance_threshold
+    type: float
+    default: 0.7
+    description: Minimum R² score required for model deployment
+  
+  - name: notification_email
+    type: string
+    default: ""
+    description: Email address for pipeline notifications
+
+# Hardware requirements
+hardware_tier: large
+environment_id: "5f9c8f5b1c9d440000a1b2c3"  # Example environment ID
+
+# Flow steps
+steps:
+  
+  # Step 1: Data Generation and Validation
+  - name: data_generation
+    description: Generate synthetic diesel fuel quality dataset
+    script: python src/data/synthetic_data_generator.py
+    hardware_tier: medium
+    timeout_minutes: 15
+    outputs:
+      - path: /mnt/code/data/diesel_fuel_quality/processed/diesel_quality_dataset.csv
+        name: training_dataset
+    environment_variables:
+      PYTHONPATH: /mnt/code
+    on_failure: stop_pipeline
+    
+  # Step 2: Exploratory Data Analysis
+  - name: exploratory_analysis
+    description: Perform comprehensive EDA and generate insights
+    script: python notebooks/01_data_exploration/diesel_fuel_eda.py
+    hardware_tier: medium
+    timeout_minutes: 20
+    depends_on: 
+      - data_generation
+    inputs:
+      - training_dataset
+    outputs:
+      - path: /mnt/artifacts/reports/eda_summary_report.md
+        name: eda_report
+      - path: /mnt/artifacts/visualizations/
+        name: eda_visualizations
+    environment_variables:
+      PYTHONPATH: /mnt/code
+    on_failure: continue_pipeline  # EDA failure shouldn't stop model training
+    
+  # Step 3: Model Training
+  - name: model_training
+    description: Train ML models for all quality parameters
+    script: python src/models/quick_model_trainer.py
+    hardware_tier: large
+    timeout_minutes: 60
+    depends_on:
+      - data_generation
+    inputs:
+      - training_dataset
+    outputs:
+      - path: /mnt/artifacts/models/
+        name: trained_models
+      - path: /mnt/artifacts/reports/model_training_report.md
+        name: training_report
+    environment_variables:
+      PYTHONPATH: /mnt/code
+      RETRAIN_MODELS: ${retrain_models}
+    on_failure: stop_pipeline
+    
+  # Step 4: Model Validation
+  - name: model_validation
+    description: Validate model performance and compliance requirements
+    script: |
+      python -c "
+      import json
+      import sys
+      sys.path.insert(0, '/mnt/code')
+      from scripts.data_config import get_data_paths
+      
+      # Load model performance
+      paths = get_data_paths()
+      with open(paths['models_path'] / 'model_performance.json', 'r') as f:
+          perf = json.load(f)
+      
+      # Check performance threshold
+      avg_r2 = sum(info['r2_score'] for info in perf['best_models'].values()) / len(perf['best_models'])
+      threshold = float('${model_performance_threshold}')
+      
+      print(f'Average R² score: {avg_r2:.4f}')
+      print(f'Required threshold: {threshold:.4f}')
+      
+      if avg_r2 >= threshold:
+          print('✅ Models meet performance requirements')
+          with open('/tmp/validation_passed', 'w') as f:
+              f.write('PASSED')
+      else:
+          print('❌ Models do not meet performance requirements')
+          sys.exit(1)
+      "
+    hardware_tier: small
+    timeout_minutes: 10
+    depends_on:
+      - model_training
+    inputs:
+      - trained_models
+    outputs:
+      - path: /tmp/validation_passed
+        name: validation_status
+    on_failure: stop_pipeline
+    
+  # Step 5: API Deployment Test
+  - name: api_deployment_test
+    description: Test API deployment and endpoints
+    script: |
+      cd /mnt/code
+      
+      # Install required packages
+      pip install fastapi uvicorn --quiet
+      
+      # Start API server in background
+      python src/api/predict.py &
+      API_PID=$!
+      
+      # Wait for server to start
+      sleep 10
+      
+      # Test health endpoint
+      curl -f http://localhost:8000/health || (echo "Health check failed" && kill $API_PID && exit 1)
+      
+      # Test prediction endpoint with sample data
+      curl -X POST "http://localhost:8000/predict" \
+           -H "Content-Type: application/json" \
+           -d '{
+             "crude_api_gravity": 35.0,
+             "crude_sulfur_ppm": 1500.0,
+             "crude_nitrogen_ppm": 500.0,
+             "crude_tan": 1.0,
+             "distillation_temp_top": 95.0,
+             "distillation_temp_middle": 250.0,
+             "distillation_temp_bottom": 385.0,
+             "distillation_pressure": 1.0,
+             "feed_rate_bpd": 50000.0,
+             "reflux_ratio": 2.5,
+             "hydrotreat_temp": 340.0,
+             "hydrotreat_pressure": 90.0,
+             "hydrogen_ratio": 300.0,
+             "lhsv": 1.5,
+             "catalyst_age_days": 200.0
+           }' || (echo "Prediction test failed" && kill $API_PID && exit 1)
+      
+      echo "✅ API tests passed"
+      kill $API_PID
+      echo "API_TEST_PASSED" > /tmp/api_test_result
+    hardware_tier: medium
+    timeout_minutes: 15
+    depends_on:
+      - model_validation
+    inputs:
+      - trained_models
+    outputs:
+      - path: /tmp/api_test_result
+        name: api_test_status
+    on_failure: continue_pipeline  # API test failure shouldn't stop the pipeline
+    
+  # Step 6: Dashboard Validation
+  - name: dashboard_validation
+    description: Validate Streamlit dashboard functionality
+    script: |
+      cd /mnt/code
+      
+      # Install Streamlit if not available
+      pip install streamlit plotly --quiet
+      
+      # Test dashboard import and basic functionality
+      python -c "
+      import sys
+      sys.path.insert(0, '/mnt/code')
+      
+      try:
+          from scripts.diesel_dashboard import DieselDashboard
+          dashboard = DieselDashboard()
+          
+          if dashboard.df.empty:
+              print('❌ Dashboard data loading failed')
+              sys.exit(1)
+          
+          if not dashboard.models:
+              print('⚠️ Dashboard models not loaded (expected for first run)')
+          else:
+              print(f'✅ Dashboard loaded with {len(dashboard.models)} models')
+          
+          print('✅ Dashboard validation passed')
+          
+      except Exception as e:
+          print(f'❌ Dashboard validation failed: {e}')
+          sys.exit(1)
+      "
+      
+      echo "DASHBOARD_VALIDATED" > /tmp/dashboard_status
+    hardware_tier: medium
+    timeout_minutes: 10
+    depends_on:
+      - model_training
+    inputs:
+      - trained_models
+    outputs:
+      - path: /tmp/dashboard_status
+        name: dashboard_status
+    on_failure: continue_pipeline
+    
+  # Step 7: Generate Deployment Report
+  - name: deployment_report
+    description: Generate comprehensive deployment report
+    script: |
+      python -c "
+      import json
+      from datetime import datetime
+      import sys
+      sys.path.insert(0, '/mnt/code')
+      from scripts.data_config import get_data_paths
+      
+      # Load performance data
+      paths = get_data_paths()
+      
+      try:
+          with open(paths['models_path'] / 'model_performance.json', 'r') as f:
+              perf = json.load(f)
+      except:
+          perf = {'best_models': {}}
+      
+      # Check validation status
+      try:
+          with open('/tmp/validation_passed', 'r') as f:
+              validation_passed = f.read().strip() == 'PASSED'
+      except:
+          validation_passed = False
+      
+      # Check API test status  
+      try:
+          with open('/tmp/api_test_result', 'r') as f:
+              api_test_passed = 'PASSED' in f.read()
+      except:
+          api_test_passed = False
+      
+      # Check dashboard status
+      try:
+          with open('/tmp/dashboard_status', 'r') as f:
+              dashboard_validated = 'VALIDATED' in f.read()
+      except:
+          dashboard_validated = False
+      
+      # Generate deployment report
+      report = {
+          'pipeline_execution': {
+              'timestamp': datetime.now().isoformat(),
+              'status': 'SUCCESS' if validation_passed else 'PARTIAL_SUCCESS',
+              'models_trained': len(perf.get('best_models', {})),
+              'validation_passed': validation_passed,
+              'api_test_passed': api_test_passed,
+              'dashboard_validated': dashboard_validated
+          },
+          'model_performance': perf.get('best_models', {}),
+          'deployment_ready': validation_passed and api_test_passed,
+          'next_steps': [
+              'Deploy API to production endpoint' if api_test_passed else 'Fix API issues',
+              'Deploy dashboard as Domino App' if dashboard_validated else 'Fix dashboard issues',
+              'Set up monitoring and alerts',
+              'Schedule automated retraining'
+          ]
+      }
+      
+      # Save deployment report
+      with open('/mnt/artifacts/reports/deployment_report.json', 'w') as f:
+          json.dump(report, f, indent=2)
+      
+      print('📊 Deployment Report Generated')
+      print(f\"Status: {report['pipeline_execution']['status']}\")
+      print(f\"Models trained: {report['pipeline_execution']['models_trained']}\")
+      print(f\"Deployment ready: {report['deployment_ready']}\")
+      "
+    hardware_tier: small
+    timeout_minutes: 5
+    depends_on:
+      - model_validation
+      - api_deployment_test
+      - dashboard_validation
+    inputs:
+      - trained_models
+      - validation_status
+      - api_test_status
+      - dashboard_status
+    outputs:
+      - path: /mnt/artifacts/reports/deployment_report.json
+        name: deployment_report
+    on_failure: continue_pipeline
+
+# Post-execution actions
+post_execution:
+  - action: send_notification
+    condition: always
+    email: ${notification_email}
+    subject: "Diesel Fuel Quality Pipeline - ${status}"
+    body: |
+      Pipeline execution completed with status: ${status}
+      
+      Summary:
+      - Models trained: ${models_trained}
+      - Validation passed: ${validation_passed}
+      - API test passed: ${api_test_passed}
+      - Dashboard validated: ${dashboard_validated}
+      
+      View results in Domino workspace.
+  
+  - action: archive_artifacts
+    condition: success
+    paths:
+      - /mnt/artifacts/models/
+      - /mnt/artifacts/reports/
+      - /mnt/artifacts/visualizations/
+
+# Scheduling (optional)
+schedule:
+  enabled: false
+  cron_expression: "0 2 * * 0"  # Weekly on Sunday at 2 AM
+  timezone: "UTC"
+
+# Monitoring and alerts
+monitoring:
+  enabled: true
+  metrics:
+    - name: model_performance
+      type: json_path
+      path: /mnt/artifacts/reports/deployment_report.json
+      json_path: "$.model_performance"
+    
+    - name: deployment_status
+      type: json_path
+      path: /mnt/artifacts/reports/deployment_report.json
+      json_path: "$.deployment_ready"
+  
+  alerts:
+    - condition: deployment_ready == false
+      message: "Model deployment readiness check failed"
+      severity: warning
+      
+    - condition: pipeline_status == "FAILED"
+      message: "Pipeline execution failed"
+      severity: critical

@@ -1,0 +1,290 @@
+{
+  "name": "Diesel Fuel Quality Prediction Launcher",
+  "description": "Self-service launcher for training diesel fuel quality prediction models with customizable parameters",
+  "version": "1.0.0",
+  
+  "parameters": [
+    {
+      "name": "data_samples",
+      "displayName": "Training Data Samples",
+      "description": "Number of synthetic samples to generate for model training",
+      "type": "integer",
+      "defaultValue": 8000,
+      "minValue": 1000,
+      "maxValue": 20000,
+      "required": true,
+      "tooltip": "More samples = better model but longer training time"
+    },
+    {
+      "name": "model_types",
+      "displayName": "Model Types to Train",
+      "description": "Select which ML algorithms to include in training",
+      "type": "multiselect",
+      "defaultValue": ["random_forest", "xgboost"],
+      "options": [
+        {"value": "random_forest", "label": "Random Forest"},
+        {"value": "xgboost", "label": "XGBoost"},
+        {"value": "linear_regression", "label": "Linear Regression"},
+        {"value": "support_vector", "label": "Support Vector Regression"}
+      ],
+      "required": true,
+      "tooltip": "Random Forest and XGBoost typically perform best"
+    },
+    {
+      "name": "target_parameters",
+      "displayName": "Quality Parameters to Predict",
+      "description": "Select which fuel quality parameters to train models for",
+      "type": "multiselect",
+      "defaultValue": ["cetane_number", "sulfur_ppm", "viscosity_cst", "quality_score"],
+      "options": [
+        {"value": "cetane_number", "label": "Cetane Number"},
+        {"value": "sulfur_ppm", "label": "Sulfur Content (ppm)"},
+        {"value": "viscosity_cst", "label": "Viscosity (cSt)"},
+        {"value": "flash_point_c", "label": "Flash Point (°C)"},
+        {"value": "density_gcc", "label": "Density (g/cm³)"},
+        {"value": "cloud_point_c", "label": "Cloud Point (°C)"},
+        {"value": "aromatic_content", "label": "Aromatic Content (%)"},
+        {"value": "quality_score", "label": "Overall Quality Score"}
+      ],
+      "required": true,
+      "tooltip": "Select key parameters relevant to your application"
+    },
+    {
+      "name": "cross_validation",
+      "displayName": "Cross Validation Folds",
+      "description": "Number of cross-validation folds for model evaluation",
+      "type": "integer",
+      "defaultValue": 5,
+      "minValue": 3,
+      "maxValue": 10,
+      "required": true,
+      "tooltip": "More folds = more robust evaluation but longer training"
+    },
+    {
+      "name": "feature_selection",
+      "displayName": "Enable Feature Selection",
+      "description": "Apply automated feature selection to improve model performance",
+      "type": "boolean",
+      "defaultValue": true,
+      "required": false,
+      "tooltip": "Recommended for better model interpretability"
+    },
+    {
+      "name": "hyperparameter_tuning",
+      "displayName": "Hyperparameter Tuning",
+      "description": "Enable automated hyperparameter optimization",
+      "type": "select",
+      "defaultValue": "basic",
+      "options": [
+        {"value": "none", "label": "No Tuning (Fastest)"},
+        {"value": "basic", "label": "Basic Grid Search"},
+        {"value": "advanced", "label": "Bayesian Optimization"}
+      ],
+      "required": true,
+      "tooltip": "Advanced tuning takes longer but may improve performance"
+    },
+    {
+      "name": "test_size",
+      "displayName": "Test Set Size",
+      "description": "Fraction of data to reserve for final testing",
+      "type": "float",
+      "defaultValue": 0.2,
+      "minValue": 0.1,
+      "maxValue": 0.4,
+      "required": true,
+      "tooltip": "Standard practice is 20-30% for test set"
+    },
+    {
+      "name": "random_seed",
+      "displayName": "Random Seed",
+      "description": "Seed for reproducible results",
+      "type": "integer",
+      "defaultValue": 42,
+      "minValue": 1,
+      "maxValue": 10000,
+      "required": false,
+      "tooltip": "Use same seed to reproduce identical results"
+    },
+    {
+      "name": "performance_threshold",
+      "displayName": "Minimum Performance Threshold",
+      "description": "Minimum R² score required for model acceptance",
+      "type": "float",
+      "defaultValue": 0.7,
+      "minValue": 0.5,
+      "maxValue": 0.99,
+      "required": true,
+      "tooltip": "Models below this threshold will be flagged for review"
+    },
+    {
+      "name": "export_format",
+      "displayName": "Model Export Format",
+      "description": "Format for exporting trained models",
+      "type": "multiselect",
+      "defaultValue": ["pickle", "mlflow"],
+      "options": [
+        {"value": "pickle", "label": "Python Pickle"},
+        {"value": "mlflow", "label": "MLflow Model"},
+        {"value": "onnx", "label": "ONNX Format"},
+        {"value": "joblib", "label": "Joblib"}
+      ],
+      "required": true,
+      "tooltip": "Choose formats compatible with your deployment environment"
+    },
+    {
+      "name": "generate_report",
+      "displayName": "Generate Analysis Report",
+      "description": "Create comprehensive training and performance report",
+      "type": "boolean",
+      "defaultValue": true,
+      "required": false,
+      "tooltip": "Includes EDA, model comparison, and deployment recommendations"
+    },
+    {
+      "name": "notification_email",
+      "displayName": "Notification Email",
+      "description": "Email address to notify when training completes",
+      "type": "string",
+      "defaultValue": "",
+      "required": false,
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "tooltip": "Leave blank to disable email notifications"
+    }
+  ],
+  
+  "execution": {
+    "script": "python src/models/parameterized_trainer.py",
+    "environment": {
+      "PYTHONPATH": "/mnt/code",
+      "MLFLOW_TRACKING_URI": "http://localhost:8768"
+    },
+    "hardwareTier": "large",
+    "timeoutMinutes": 90,
+    "workingDirectory": "/mnt/code"
+  },
+  
+  "outputs": {
+    "artifacts": [
+      {
+        "name": "trained_models",
+        "path": "/mnt/artifacts/models/",
+        "description": "Directory containing all trained models and scalers"
+      },
+      {
+        "name": "training_report",
+        "path": "/mnt/artifacts/reports/model_training_report.md",
+        "description": "Comprehensive training and performance report"
+      },
+      {
+        "name": "performance_metrics",
+        "path": "/mnt/artifacts/reports/model_performance.json", 
+        "description": "JSON file with detailed performance metrics"
+      },
+      {
+        "name": "visualization_plots",
+        "path": "/mnt/artifacts/visualizations/",
+        "description": "EDA plots and model performance visualizations"
+      }
+    ],
+    "mlflow_experiment": {
+      "name": "diesel_fuel_quality_prediction",
+      "tracking_uri": "http://localhost:8768"
+    }
+  },
+  
+  "validation": {
+    "preExecution": [
+      {
+        "check": "data_samples >= 1000",
+        "message": "Minimum 1000 samples required for reliable training"
+      },
+      {
+        "check": "test_size >= 0.1 && test_size <= 0.4",
+        "message": "Test size must be between 10% and 40%"
+      },
+      {
+        "check": "cross_validation >= 3",
+        "message": "Minimum 3 folds required for cross-validation"
+      },
+      {
+        "check": "performance_threshold >= 0.5",
+        "message": "Performance threshold must be at least 0.5"
+      }
+    ],
+    "postExecution": [
+      {
+        "check": "file_exists(/mnt/artifacts/models/model_performance.json)",
+        "message": "Model performance file should be created"
+      },
+      {
+        "check": "file_exists(/mnt/artifacts/reports/model_training_report.md)",
+        "message": "Training report should be generated"
+      }
+    ]
+  },
+  
+  "documentation": {
+    "overview": "This launcher enables self-service training of machine learning models for predicting diesel fuel quality parameters from refinery process inputs. Users can customize training parameters, select model types, and specify which quality parameters to predict.",
+    
+    "quickStart": [
+      "1. Select target quality parameters you want to predict",
+      "2. Choose model types (Random Forest + XGBoost recommended)",
+      "3. Set training data size (8000 samples is a good default)",
+      "4. Configure performance threshold (0.7 R² recommended)",
+      "5. Click 'Launch' to start training",
+      "6. Monitor progress in MLflow UI",
+      "7. Review training report in artifacts"
+    ],
+    
+    "recommendations": {
+      "beginners": {
+        "data_samples": 5000,
+        "model_types": ["random_forest", "xgboost"],
+        "hyperparameter_tuning": "basic",
+        "performance_threshold": 0.7
+      },
+      "advanced": {
+        "data_samples": 15000,
+        "model_types": ["random_forest", "xgboost", "support_vector"],
+        "hyperparameter_tuning": "advanced", 
+        "feature_selection": true,
+        "cross_validation": 10
+      },
+      "production": {
+        "data_samples": 20000,
+        "model_types": ["xgboost"],
+        "hyperparameter_tuning": "advanced",
+        "performance_threshold": 0.85,
+        "export_format": ["mlflow", "onnx"]
+      }
+    },
+    
+    "troubleshooting": [
+      {
+        "issue": "Training takes too long",
+        "solution": "Reduce data_samples or disable hyperparameter_tuning"
+      },
+      {
+        "issue": "Low model performance",
+        "solution": "Increase data_samples, enable feature_selection, or try advanced hyperparameter_tuning"
+      },
+      {
+        "issue": "Memory errors",
+        "solution": "Reduce data_samples or disable computationally intensive model types"
+      },
+      {
+        "issue": "Models don't meet threshold",
+        "solution": "Lower performance_threshold or improve data quality"
+      }
+    ]
+  },
+  
+  "metadata": {
+    "author": "Data Science Team",
+    "version": "1.0.0",
+    "lastUpdated": "2024-11-19",
+    "tags": ["machine-learning", "fuel-quality", "refinery", "prediction"],
+    "category": "Model Training",
+    "estimatedRunTime": "15-90 minutes depending on parameters"
+  }
+}

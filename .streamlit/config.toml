@@ -1,0 +1,10 @@
+[theme]
+primaryColor = "#1E3A8A"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F8FAFC"
+textColor = "#000000"
+font = "sans serif"
+base = "light"
+
+[global]
+unitTest = true
